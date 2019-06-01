@@ -1,15 +1,12 @@
 #include "matrix.h"
 
-// TODO: define elsewhere
-typedef unsigned int uint;
-
 //Generate once
-static uint inverse[MAX];
+static uint8_t* inverse = NULL;
 
 matrix_t *create(const size_t rows, const size_t columns) {
   matrix_t* matrix = malloc(sizeof(matrix_t));
-  uint * row;
-  int i, j;
+  uint8_t * row;
+  size_t i, j;
 
   if(NULL == matrix) {
     return NULL;
@@ -18,7 +15,7 @@ matrix_t *create(const size_t rows, const size_t columns) {
   matrix->columns = columns;
   matrix->rows = rows;
 
-  uint ** data = malloc(sizeof(uint *) * rows);
+  uint8_t ** data = malloc(sizeof(uint8_t *) * rows);
 
   if(NULL == data) {
     free(matrix);
@@ -28,7 +25,7 @@ matrix_t *create(const size_t rows, const size_t columns) {
   bool nullRow = false;
 
   for (i = 0; i < rows; i++) {
-    row = malloc(sizeof(uint) * columns);
+    row = malloc(sizeof(uint8_t) * columns);
 
     if(NULL == row) {
       nullRow = true;
@@ -52,7 +49,7 @@ matrix_t *create(const size_t rows, const size_t columns) {
 }
 
 void delete(matrix_t * matrix) {
-  int i;
+  size_t i;
 
   if(NULL == matrix)
     return ;
@@ -64,12 +61,12 @@ void delete(matrix_t * matrix) {
   free(matrix);
 }
 
-uint* rowSum(const uint * row1, const uint * row2, uint * result,  uint mod, size_t length) {
+uint8_t* rowSum(const uint8_t * row1, const uint8_t * row2, uint8_t * result,  uint8_t mod, size_t length) {
 
   if(NULL == row1 || NULL == row2 || NULL == result)
     return NULL;
 
-  int i;
+  size_t i;
   for (i = 0; i < length; i++) {
     result[i] = (row1[i] + row2[i]) % mod;
   }
@@ -77,12 +74,12 @@ uint* rowSum(const uint * row1, const uint * row2, uint * result,  uint mod, siz
   return result;
 }
 
-uint* rowTimesScalar(const uint * row, uint * result,  uint mod, size_t length, int scalar) {
+uint8_t* rowTimesScalar(const uint8_t * row, uint8_t * result,  uint8_t mod, size_t length, uint8_t scalar) {
 
   if(NULL == row || NULL == result)
     return NULL;
 
-  int i;
+  size_t i;
   for (i = 0; i < length; i++) {
     result[i] = (row[i] * scalar) % mod;
   }
@@ -90,24 +87,24 @@ uint* rowTimesScalar(const uint * row, uint * result,  uint mod, size_t length, 
   return result;
 }
 
-uint* rowDividedByScalar(const uint * row, uint * result,  uint mod, size_t length, int scalar) {
+uint8_t* rowDividedByScalar(const uint8_t * row, uint8_t * result,  uint8_t mod, size_t length, uint8_t scalar) {
 
   if(NULL == row || NULL == result)
     return NULL;
 
-  uint inv = inverse[scalar];
+  uint8_t inv = inverse[scalar];
 
   result = rowTimesScalar(row, result, mod, length, inv);
 
   return result;
 }
 
-uint* rowSubstract(const uint * row1, const uint * row2, uint * result,  uint mod, size_t length) {
+uint8_t* rowSubstract(const uint8_t * row1, const uint8_t * row2, uint8_t * result,  uint8_t mod, size_t length) {
 
   if(NULL == row1 || NULL == row2 || NULL == result)
     return NULL;
 
-  int i;
+  size_t i;
   for (i = 0; i < length; i++) {
     result[i] = (((row1[i] - row2[i]) % mod) + mod) % mod;
   }
@@ -115,9 +112,9 @@ uint* rowSubstract(const uint * row1, const uint * row2, uint * result,  uint mo
   return result;
 }
 
-matrix_t * sum(const matrix_t * m1, const matrix_t * m2, matrix_t * result, uint mod) {
+matrix_t * sum(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
 
-  if(NULL == m1 || NULL == m2 || NULL == result)
+  if(NULL == m1 || NULL == m2)
     return NULL;
 
   if(m1->columns != m2->columns || m1->rows != m2->rows)
@@ -126,19 +123,21 @@ matrix_t * sum(const matrix_t * m1, const matrix_t * m2, matrix_t * result, uint
   size_t columns = m1->columns;
   size_t rows = m1->rows;
 
-  if(result->columns != columns || result->rows != rows)
+  matrix_t * result = create(rows, columns);
+
+  if(NULL == result)
     return NULL;
 
-  int i;
+  size_t i;
   for (i = 0; i < rows; i++) {
     rowSum(m1->data[i], m2->data[i], result->data[i], mod, columns);
   }
   return result;
 }
 
-matrix_t * substract(const matrix_t * m1, const matrix_t * m2, matrix_t * result, uint mod) {
+matrix_t * substract(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
 
-  if(NULL == m1 || NULL == m2 || NULL == result)
+  if(NULL == m1 || NULL == m2)
     return NULL;
 
   if(m1->columns != m2->columns || m1->rows != m2->rows)
@@ -147,34 +146,60 @@ matrix_t * substract(const matrix_t * m1, const matrix_t * m2, matrix_t * result
   size_t columns = m1->columns;
   size_t rows = m1->rows;
 
-  if(result->columns != columns || result->rows != rows)
+  matrix_t * result = create(rows, columns);
+
+  if(NULL == result)
     return NULL;
 
-  int i;
+  size_t i;
   for (i = 0; i < rows; i++) {
     rowSubstract(m1->data[i], m2->data[i], result->data[i], mod, columns);
   }
   return result;
 }
 
-matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, matrix_t * result, uint mod) {
+matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
 
-  if(NULL == m1 || NULL == m2 || NULL == result)
+  if(NULL == m1 || NULL == m2 )
     return NULL;
 
   if(m1->columns != m2->rows)
     return NULL;
 
-  if(result->rows != m1->rows || result->columns != m2->columns)
+  matrix_t * result = create(m1->rows, m2->columns);
+
+  if(NULL == result)
     return NULL;
 
-  int i, j, k;
+  size_t i, j, k;
   for (i = 0; i < m1->rows; i++) {
     for (j = 0; j < m2->columns; j++) {
       for (k = 0; k < m2->rows; k++) {
         result->data[i][j] += (m1->data[i][k] * m2->data[k][j]);
       }
       result->data[i][j] %= mod;
+    }
+  }
+  return result;
+}
+
+matrix_t * transpose(const matrix_t * m) {
+
+  if(NULL == m)
+    return NULL;
+
+  size_t columns = m->columns;
+  size_t rows = m->rows;
+
+  matrix_t * result = create(rows, columns);
+
+  if(NULL == result)
+    return NULL;
+
+  size_t i, j;
+  for (i = 0; i < rows; i++) {
+    for (j = 0; j < columns; j++) {
+      result->data[j][i] = m->data[i][j];
     }
   }
   return result;
@@ -203,12 +228,15 @@ int modInverse(int a, int mod) {
   return (x[0] % mod + mod) % mod;
 }
 
-void print(matrix_t * m1) {
-  int i, j;
-  for (i = 0; i < m1->rows; i++) {
-    for (j = 0; j < m1->columns; j++) {
-      printf("%d ", m1->data[i][j]);
-    }
-    putchar('\n');
+static void generateModInverses(int mod) {
+
+  inverse = malloc(sizeof(uint8_t) * mod);
+  if(NULL == inverse) {
+    return ;
+  }
+
+  int i;
+  for (i = 1; i < mod; i++) {
+    inverse[i] = (uint8_t)modInverse(i, mod);
   }
 }
