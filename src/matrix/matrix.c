@@ -1,6 +1,7 @@
 #include "matrix.h"
 
-#include <stdio.h>
+// TODO: define elsewhere
+typedef unsigned int uint;
 
 //Generate once
 static uint inverse[MAX];
