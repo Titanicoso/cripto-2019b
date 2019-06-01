@@ -1,7 +1,7 @@
 #include "matrix.h"
 
 //Generate once
-static uint8_t* inverse = NULL;
+uint8_t* inverse = NULL;
 
 matrix_t *create(const size_t rows, const size_t columns) {
   matrix_t* matrix = malloc(sizeof(matrix_t));
@@ -167,19 +167,22 @@ matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
     return NULL;
 
   matrix_t * result = create(m1->rows, m2->columns);
+  matrix_t * m2T = transpose(m2);
 
   if(NULL == result)
     return NULL;
 
   size_t i, j, k;
   for (i = 0; i < m1->rows; i++) {
-    for (j = 0; j < m2->columns; j++) {
-      for (k = 0; k < m2->rows; k++) {
-        result->data[i][j] += (m1->data[i][k] * m2->data[k][j]);
+    for (j = 0; j < m2T->rows; j++) {
+      for (k = 0; k < m2T->columns; k++) {
+        result->data[i][j] += (m1->data[i][k] * m2T->data[j][k]);
       }
       result->data[i][j] %= mod;
     }
   }
+
+  free(m2T);
   return result;
 }
 
@@ -191,7 +194,7 @@ matrix_t * transpose(const matrix_t * m) {
   size_t columns = m->columns;
   size_t rows = m->rows;
 
-  matrix_t * result = create(rows, columns);
+  matrix_t * result = create(columns, rows);
 
   if(NULL == result)
     return NULL;
@@ -228,7 +231,7 @@ int modInverse(int a, int mod) {
   return (x[0] % mod + mod) % mod;
 }
 
-static void generateModInverses(int mod) {
+void generateModInverses(int mod) {
 
   inverse = malloc(sizeof(uint8_t) * mod);
   if(NULL == inverse) {
