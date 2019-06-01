@@ -48,17 +48,19 @@ matrix_t *create(const size_t rows, const size_t columns) {
   return matrix;
 }
 
-void delete(matrix_t * matrix) {
+bool delete(matrix_t * matrix) {
   size_t i;
 
   if(NULL == matrix)
-    return ;
+    return false;
 
   for (i = 0; i < matrix->rows; i++) {
     free(matrix->data[i]);
   }
   free(matrix->data);
   free(matrix);
+
+  return true;
 }
 
 uint8_t* rowSum(const uint8_t * row1, const uint8_t * row2, uint8_t * result,  uint8_t mod, size_t length) {
@@ -208,6 +210,14 @@ matrix_t * transpose(const matrix_t * m) {
   return result;
 }
 
+bool setPosition(matrix_t * matrix, const size_t row, const size_t column, const uint8_t value) {
+  if(NULL == matrix)
+    return false;
+
+  matrix->data[row][column] = value;
+  return true;
+}
+
 int modInverse(int a, int mod) {
 
   if(a < 1)
@@ -231,15 +241,17 @@ int modInverse(int a, int mod) {
   return (x[0] % mod + mod) % mod;
 }
 
-void generateModInverses(int mod) {
+bool generateModInverses(int mod) {
 
   inverse = malloc(sizeof(uint8_t) * mod);
   if(NULL == inverse) {
-    return ;
+    return false;
   }
 
   int i;
   for (i = 1; i < mod; i++) {
     inverse[i] = (uint8_t)modInverse(i, mod);
   }
+
+  return true;
 }

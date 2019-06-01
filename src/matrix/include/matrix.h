@@ -14,7 +14,7 @@ typedef struct {
 
 matrix_t* create(size_t rows, size_t columns);
 
-void delete(matrix_t * matrix);
+bool delete(matrix_t * matrix);
 
 matrix_t * sum(const matrix_t * m1, const matrix_t * m2, uint8_t mod);
 
@@ -23,5 +23,7 @@ matrix_t * substract(const matrix_t * m1, const matrix_t * m2, uint8_t mod);
 matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod);
 
 matrix_t * transpose(const matrix_t * m);
+
+bool setPosition(matrix_t * matrix, const size_t row, const size_t column, const uint8_t value);
 
 #endif
