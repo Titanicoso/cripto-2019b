@@ -2,25 +2,19 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "random.h"
-
-#define SET 10 
-#define MAX 50 
-/*variable global*/
-int64_t seed; /*seed debe ser de 48 bits; se elige este tipo de 64 bits*/ 
+#include "matrix.h"
+#include "bmp.h"
 
 int 
 main(void)
 {
-
-    int i;
-    uint8_t num;
-    setSeed(SET);
-    for (i = 0; i < MAX;i++)
-    {
-        num = nextChar(seed);
-        printf("%d\t", num);
+    matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
+    //printf("%d %d\n", matrix->rows, matrix->columns);
+    int i, j;
+    for (i = 0; i < matrix->rows; i++) {
+        for (j = 0; j < matrix->columns; j++) {
+            printf("%.2x ", matrix->data[i][j]);
+        }
+        printf("\n");
     }
-    return EXIT_SUCCESS; 
-    return 1;
 }
