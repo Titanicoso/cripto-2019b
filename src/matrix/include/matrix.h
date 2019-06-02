@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 typedef struct {
     uint8_t ** data;
@@ -25,5 +26,15 @@ matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod);
 matrix_t * transpose(const matrix_t * m);
 
 bool setPosition(matrix_t * matrix, const size_t row, const size_t column, const uint8_t value);
+
+bool generateModInverses(int mod);
+
+matrix_t * identity(const size_t size);
+
+bool equals(const matrix_t * m1, const matrix_t * m2);
+
+matrix_t * gaussElimination(const matrix_t * matrix, const uint8_t mod);
+
+matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod);
 
 #endif

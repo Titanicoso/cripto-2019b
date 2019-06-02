@@ -25,7 +25,7 @@ matrix_t *create(const size_t rows, const size_t columns) {
   bool nullRow = false;
 
   for (i = 0; i < rows; i++) {
-    row = malloc(sizeof(uint8_t) * columns);
+    row = calloc(columns, sizeof(uint8_t));
 
     if(NULL == row) {
       nullRow = true;
@@ -184,7 +184,7 @@ matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
     }
   }
 
-  free(m2T);
+  delete(m2T);
   return result;
 }
 
@@ -212,6 +212,9 @@ matrix_t * transpose(const matrix_t * m) {
 
 bool setPosition(matrix_t * matrix, const size_t row, const size_t column, const uint8_t value) {
   if(NULL == matrix)
+    return false;
+
+  if(row >= matrix->rows || column >= matrix->columns)
     return false;
 
   matrix->data[row][column] = value;
@@ -254,4 +257,306 @@ bool generateModInverses(int mod) {
   }
 
   return true;
+}
+
+matrix_t * identity(const size_t size) {
+
+  matrix_t * matrix = create(size, size);
+
+  if(NULL == matrix)
+    return NULL;
+
+  size_t i;
+  for (i = 0; i < size; i++) {
+      setPosition(matrix, i, i, 1);
+  }
+
+  return matrix;
+}
+
+bool copyRow(uint8_t * dest, const uint8_t * src, const size_t size) {
+
+  if(NULL == src || NULL == dest) {
+    return false;
+  }
+
+  size_t i;
+  for (i = 0; i < size; i++) {
+    dest[i] = src[i];
+  }
+
+  return true;
+}
+
+matrix_t * augment(const matrix_t * m1, const matrix_t * m2) {
+
+  if(NULL == m1 || NULL == m2) {
+    return NULL;
+  }
+
+  size_t rows = m1->rows > m2->rows ? m1->rows : m2->rows;
+  size_t columns = m1->columns + m2->columns;
+
+  matrix_t * augmented = create(rows, columns);
+
+  if(NULL == augmented)
+    return NULL;
+
+  size_t i;
+  for (i = 0; i < rows; i++) {
+    if(m1->rows > i) {
+      copyRow(augmented->data[i], m1->data[i], m1->columns);
+    }
+    if(m2->rows > i) {
+      copyRow(augmented->data[i] + m1->columns, m2->data[i], m2->columns);
+    }
+  }
+  return augmented;
+}
+
+bool swapRows(matrix_t * matrix, const size_t row1, const size_t row2) {
+
+  if(NULL == matrix) {
+    return false;
+  }
+
+  if(row1 >= matrix->rows || row2 >= matrix->rows) {
+    return false;
+  }
+
+  if(row1 == row2){
+    return true;
+  }
+
+  size_t columns = matrix->columns;
+  uint8_t * aux = malloc(sizeof(uint8_t) * columns);
+
+  if(NULL == aux)
+    return false;
+
+  copyRow(aux, matrix->data[row2], columns);
+  copyRow(matrix->data[row2], matrix->data[row1], columns);
+  copyRow(matrix->data[row1], aux, columns);
+  free(aux);
+
+  return true;
+}
+
+bool equals(const matrix_t * m1, const matrix_t * m2) {
+
+  if(m1->rows != m2->rows)
+    return false;
+
+  if(m1->columns != m2->columns)
+    return false;
+
+  size_t i, j;
+  for (i = 0; i < m1->rows; i++) {
+    for (j = 0; j < m1->columns; j++) {
+      if(m1->data[i][j] != m2->data[i][j])
+        return false;
+    }
+  }
+
+  return true;
+}
+
+matrix_t * clone(const matrix_t * matrix) {
+
+  if(NULL == matrix)
+    return NULL;
+
+  size_t rows = matrix->rows;
+  size_t columns = matrix->columns;
+
+  matrix_t * result = create(rows, columns);
+
+  if(NULL == result)
+    return NULL;
+
+  size_t i;
+  for (i = 0; i < rows; i++) {
+    copyRow(result->data[i], matrix->data[i], columns);
+  }
+
+  return result;
+}
+
+matrix_t * reduce(const matrix_t * matrix, const size_t rowStart, const size_t rowEnd,
+        const size_t colStart, const size_t colEnd) {
+
+  if(NULL == matrix)
+    return NULL;
+
+  size_t rows = matrix->rows;
+  size_t columns = matrix->columns;
+
+  if(rowStart > rowEnd || rowStart > rows || rowEnd > rows)
+    return NULL;
+
+  if(colStart > colEnd || colStart > columns || colEnd > columns)
+    return NULL;
+
+  matrix_t * result = create(rowEnd - rowStart, colEnd - colStart);
+
+  if(NULL == result)
+    return NULL;
+
+  size_t i;
+  for (i = rowStart; i < rowEnd; i++) {
+    copyRow(result->data[i - rowStart], matrix->data[i] + colStart, colEnd - colStart);
+  }
+
+  return result;
+}
+
+long findPivot(const matrix_t * matrix, const size_t startRow, const size_t column) {
+
+  if(NULL == matrix)
+    return -1;
+
+  size_t rows = matrix->rows;
+  size_t columns = matrix->columns;
+
+  if(startRow >= rows || column >= columns)
+    return -1;
+
+  size_t i;
+  long index = -1;
+  bool found = false;
+  for (i = startRow; i < rows && !found; i++) {
+    if(matrix->data[i][column] != 0) {
+      found = true;
+      index = i;
+    }
+  }
+
+  return index;
+}
+
+matrix_t * gaussElimination(const matrix_t * matrix, const uint8_t mod) {
+
+  if(NULL == matrix) {
+    return NULL;
+  }
+
+  size_t rows = matrix->rows;
+  size_t columns = matrix->columns;
+
+  matrix_t * result = clone(matrix);
+
+  if(NULL == result)
+    return NULL;
+
+  uint8_t * aux = malloc(sizeof(uint8_t) * columns);
+
+  if(NULL == aux)
+    return NULL;
+
+  size_t i = 0, j = 0;
+  uint8_t value = 0;
+  size_t row;
+
+  while(i < rows && j < columns) {
+
+    long index = findPivot(result, i, j);
+
+    if(index >= 0) {
+      value = result->data[index][j];
+      swapRows(result, (size_t) index, i);
+
+      if(value != 1) {
+        rowDividedByScalar(result->data[i], result->data[i], mod, columns, value);
+      }
+
+      for (row = 0; row < rows; row++) {
+        uint8_t element = result->data[row][j];
+        if(row != i && element != 0) {
+          aux = rowTimesScalar(result->data[i], aux, mod, columns, element);
+          result->data[row] = rowSubstract(result->data[row], aux, result->data[row], mod, columns);
+        }
+      }
+      i++;
+    }
+    j++;
+  }
+
+  return result;
+}
+
+bool nonZeroRow(const uint8_t * row, const size_t columns) {
+
+  if(NULL == row)
+    return false;
+
+  size_t i;
+  for (i = 0; i < columns; i++) {
+    if(row[i] != 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+size_t getRowEchelonRank(const matrix_t * matrix) {
+
+  if (NULL == matrix)
+    return 0;
+
+  size_t i;
+  size_t counter = 0;
+  for (i = 0; i < matrix->rows; i++) {
+    if (nonZeroRow(matrix->data[i], matrix->columns)) {
+      counter++;
+    }
+  }
+
+  return counter;
+}
+
+matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod) {
+
+  if(NULL == matrix) {
+    return NULL;
+  }
+
+  size_t rows = matrix->rows;
+  size_t columns = matrix->columns;
+
+  if(rows != columns) {
+    return NULL;
+  }
+
+  matrix_t * iden = identity(rows);
+
+  if(NULL == iden) {
+    return NULL;
+  }
+
+  matrix_t * augmented = augment(matrix, iden);
+
+  if(NULL == augmented) {
+    delete(iden);
+    return NULL;
+  }
+
+  matrix_t * result = gaussElimination(augmented, mod);
+
+  matrix_t * inv = reduce(result, 0, rows, columns, augmented->columns);
+  matrix_t * aux = reduce(result, 0, rows, 0, columns);
+
+  size_t rank = getRowEchelonRank(aux);
+
+  delete(aux);
+  delete(result);
+  delete(augmented);
+  delete(iden);
+
+  if(rank != columns) {
+    delete(inv);
+    return NULL;
+  }
+
+  return result;
 }
