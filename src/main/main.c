@@ -179,3 +179,4 @@ int setN(int n)
 	}
 	options->error = "N must be a positive integer";
 	return 0;
+}

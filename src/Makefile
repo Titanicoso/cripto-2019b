@@ -4,12 +4,15 @@ DEPS = $(wildcard ./*/include/*.h)
 DEPSFOLDER = $(wildcard ../*/include)
 INC_PARAMS=$(DEPSFOLDER:%=-I%)
 
-all: main matrix steganography linkup app
+all: main matrix steganography linkup app bmp
 
 fromzero: clean all ; ./app
 
 main:
 	cd main; make all
+
+bmp:
+	cd bmp; make all
 
 matrix:
 	cd matrix; make all
@@ -29,6 +32,7 @@ clean:
 	cd matrix; make clean
 	cd steganography; make clean
 	cd random; make clean
+	cd bmp; make clean
 	rm app
 
 .PHONY: all clean fromzero main steganography matrix app
