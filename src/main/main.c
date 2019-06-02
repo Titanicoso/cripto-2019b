@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
+#include "matrix.h"
+#include "bmp.h"
 #include "main.h"
 #include "random.h"
 #include "messages.h"
@@ -78,6 +80,15 @@ main(int argc, char* argv[])
 
 int excecute(options_st * options)
 {
+	matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
+    //printf("%d %d\n", matrix->rows, matrix->columns);
+    int i, j;
+    for (i = 0; i < matrix->rows; i++) {
+        for (j = 0; j < matrix->columns; j++) {
+            printf("%.2x ", matrix->data[i][j]);
+        }
+        printf("\n");
+    }
 	return 0;
 }
 
@@ -168,4 +179,3 @@ int setN(int n)
 	}
 	options->error = "N must be a positive integer";
 	return 0;
-}
