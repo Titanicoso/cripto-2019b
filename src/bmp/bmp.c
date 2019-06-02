@@ -6,7 +6,6 @@ matrix_t * read_bmp(const char * filename, bool color_bmp)
     BITMAPFILEHEADER bitmap_file_header;
     BITMAPINFOHEADER bitmap_info_header;
     matrix_t * matrix;
-    int index = 0;
     int pixel_size;
     if (color_bmp) {
         pixel_size = 3;
