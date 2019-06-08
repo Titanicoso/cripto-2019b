@@ -579,7 +579,7 @@ matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod) {
 matrix_t * proj(const matrix_t * matrix, const uint8_t mod) {
 
   matrix_t * transposed = transpose(matrix);
-  matrix_t * multiplication = multiply(matrix, transposed, mod);
+  matrix_t * multiplication = multiply(transposed, matrix, mod);
   matrix_t * inverse = inverseMatrix(multiplication, mod);
   matrix_t * aux = multiply(matrix, inverse, mod);
   matrix_t * result = multiply(aux, transposed, mod);
