@@ -515,6 +515,20 @@ size_t getRowEchelonRank(const matrix_t * matrix) {
   return counter;
 }
 
+size_t getRank(const matrix_t * matrix, const uint8_t mod) {
+
+  if (NULL == matrix)
+    return 0;
+
+  matrix_t * rowEchelon = gaussElimination(matrix, mod);
+
+  size_t rank = getRowEchelonRank(rowEchelon);
+
+  delete(rowEchelon);
+
+  return rank;
+}
+
 matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod) {
 
   if(NULL == matrix) {
@@ -558,7 +572,7 @@ matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod) {
     return NULL;
   }
 
-  return result;
+  return inv;
 }
 
 bool isMatrixOfRank(matrix_t * matrix, int k)
