@@ -177,10 +177,11 @@ matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
   size_t i, j, k;
   for (i = 0; i < m1->rows; i++) {
     for (j = 0; j < m2T->rows; j++) {
+      uint16_t value = 0;
       for (k = 0; k < m2T->columns; k++) {
-        result->data[i][j] += (m1->data[i][k] * m2T->data[j][k]);
+        value += (m1->data[i][k] * m2T->data[j][k]);
       }
-      result->data[i][j] %= mod;
+      result->data[i][j] = (uint8_t) (value % mod);
     }
   }
 
