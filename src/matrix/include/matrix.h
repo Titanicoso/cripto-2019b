@@ -39,4 +39,6 @@ size_t getRank(const matrix_t * matrix, const uint8_t mod);
 
 matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod);
 
+matrix_t * proj(const matrix_t * matrix, const uint8_t mod);
+
 #endif
