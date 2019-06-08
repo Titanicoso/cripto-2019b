@@ -1,8 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define DISTRIBUTION 1
-#define RECOVERY 2
+#define DISTRIBUTION_MODE 1
+#define RECOVERY_MODE 2
 
 typedef struct {
     int mode;

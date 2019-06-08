@@ -10,6 +10,8 @@
 #include "main.h"
 #include "random.h"
 #include "messages.h"
+#include "recovery.h"
+#include "distribution.h"
 
 int 
 main(int argc, char* argv[])
@@ -23,11 +25,11 @@ main(int argc, char* argv[])
 		{
 			// secret image distribution
 			case 'd':
-				valid = setMode(DISTRIBUTION);
+				valid = setMode(DISTRIBUTION_MODE);
 				break;
 			// secret image recovery
 			case 'r':
-				valid = setMode(RECOVERY);
+				valid = setMode(RECOVERY_MODE);
 				break;
 			// In case of -d it must be a B&W and it will be the image to hide
 			// In case of -r it will the output image file.
@@ -77,13 +79,14 @@ int execute(options_st * options)
 {
 	switch(options->mode)
 	{
-		case DISTRIBUTION: distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
-		case RECOVERY:recoverSecret(); break;
+		case DISTRIBUTION_MODE: distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
+		case RECOVERY_MODE: recoverSecret(); break;
 		default: exit(0);
 	}
 	
-	matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
+	//matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
     //printf("%d %d\n", matrix->rows, matrix->columns);
+	/*
     int i, j;
     for (i = 0; i < matrix->rows; i++) {
         for (j = 0; j < matrix->columns; j++) {
@@ -91,6 +94,7 @@ int execute(options_st * options)
         }
         printf("\n");
     }
+	*/
 	return 0;
 }
 
@@ -152,7 +156,7 @@ int fileExists(const char * name)
 
 int setMode(int mode)
 {
-	if (mode != DISTRIBUTION && mode != RECOVERY)
+	if (mode != DISTRIBUTION_MODE && mode != RECOVERY_MODE)
 	{
 		options->error = "Error setting mode";
 		return 0;

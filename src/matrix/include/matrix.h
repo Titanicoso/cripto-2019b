@@ -39,6 +39,4 @@ size_t getRank(const matrix_t * matrix, const uint8_t mod);
 
 matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod);
 
-bool isMatrixOfRank(matrix_t * matrix, int rank);
-
 #endif
