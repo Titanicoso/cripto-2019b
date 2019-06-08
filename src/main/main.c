@@ -71,14 +71,14 @@ main(int argc, char* argv[])
 	}
 	else
 	{
-		excecute(options);
+		execute(options);
 	}
 	if (argv[optind] == NULL) 
   		printHelp();
     return EXIT_SUCCESS;
 }
 
-int excecute(options_st * options)
+int execute(options_st * options)
 {
 	matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
     //printf("%d %d\n", matrix->rows, matrix->columns);

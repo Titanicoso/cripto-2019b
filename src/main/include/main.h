@@ -22,7 +22,7 @@ int setK(int);
 int setDirectory(const char*);
 int directoryExists(const char* directory);
 int fileExists(const char * file);
-int excecute(options_st * options);
+int execute(options_st * options);
 
 extern options_st * options;
 
