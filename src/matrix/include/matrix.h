@@ -35,6 +35,8 @@ bool equals(const matrix_t * m1, const matrix_t * m2);
 
 matrix_t * gaussElimination(const matrix_t * matrix, const uint8_t mod);
 
+size_t getRank(const matrix_t * matrix, const uint8_t mod);
+
 matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod);
 
 #endif
