@@ -33,6 +33,5 @@ clean:
 	cd steganography; make clean
 	cd random; make clean
 	cd bmp; make clean
-	rm app
 
 .PHONY: all clean fromzero main steganography matrix app

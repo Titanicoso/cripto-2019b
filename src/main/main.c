@@ -11,11 +11,6 @@
 #include "random.h"
 #include "messages.h"
 
-#define SET 10
-#define MAX 50 
-/*variable global*/
-int64_t seed; /*seed debe ser de 48 bits; se elige este tipo de 64 bits*/ 
-
 int 
 main(int argc, char* argv[])
 {
@@ -80,6 +75,13 @@ main(int argc, char* argv[])
 
 int execute(options_st * options)
 {
+	switch(options->mode)
+	{
+		case DISTRIBUTION: distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
+		case RECOVERY:recoverSecret(); break;
+		default: exit(0);
+	}
+	
 	matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
     //printf("%d %d\n", matrix->rows, matrix->columns);
     int i, j;

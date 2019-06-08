@@ -560,3 +560,9 @@ matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod) {
 
   return result;
 }
+
+bool isMatrixOfRank(matrix_t * matrix, int k)
+{
+  // TODO: fillout method.
+  return 1;
+}
