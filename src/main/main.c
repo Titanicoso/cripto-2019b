@@ -169,22 +169,22 @@ int setMode(int mode)
 
 int setK(int k)
 {
-	if (k >=2)
+	if (k >= 2 && k < 252)
 	{
 		options->k = k;
 		return 1;
 	}
-	options->error = "K must be a positive integer";
+	options->error = "K must be a positive integer and less than 252";
 	return 0;
 }
 
 int setN(int n)
 {
-	if (n > 0)
+	if (n > 0 && n < 252)
 	{
 		options->n = n;
 		return 1;
 	}
-	options->error = "N must be a positive integer";
+	options->error = "N must be a positive integer and less than 252";
 	return 0;
 }
