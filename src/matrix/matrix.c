@@ -289,7 +289,8 @@ bool copyRow(uint8_t * dest, const uint8_t * src, const size_t size) {
   return true;
 }
 
-matrix_t * augment(const matrix_t * m1, const matrix_t * m2) {
+matrix_t * augment(const matrix_t * m1, const matrix_t * m2)
+{
 
   if(NULL == m1 || NULL == m2) {
     return NULL;

@@ -41,4 +41,6 @@ matrix_t * inverseMatrix(const matrix_t * matrix, const uint8_t mod);
 
 matrix_t * proj(const matrix_t * matrix, const uint8_t mod);
 
+matrix_t * augment(const matrix_t * m1, const matrix_t * m2);
+
 #endif

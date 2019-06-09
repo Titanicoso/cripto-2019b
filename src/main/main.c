@@ -62,6 +62,8 @@ main(int argc, char* argv[])
 				break;
 		}
 	}
+	if (options->k > options->n)
+		printError("k should be less or equal to n");
 	if (!valid)
 	{
 		printError(options->error);
@@ -167,22 +169,22 @@ int setMode(int mode)
 
 int setK(int k)
 {
-	if (k > 0)
+	if (k >= 2 && k < 252)
 	{
 		options->k = k;
 		return 1;
 	}
-	options->error = "K must be a positive integer";
+	options->error = "K must be a positive integer and less than 252";
 	return 0;
 }
 
 int setN(int n)
 {
-	if (n > 0)
+	if (n > 0 && n < 252)
 	{
 		options->n = n;
 		return 1;
 	}
-	options->error = "N must be a positive integer";
+	options->error = "N must be a positive integer and less than 252";
 	return 0;
 }
