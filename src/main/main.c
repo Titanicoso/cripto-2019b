@@ -62,6 +62,8 @@ main(int argc, char* argv[])
 				break;
 		}
 	}
+	if (options->k > options->n)
+		printError("k should be less or equal to n");
 	if (!valid)
 	{
 		printError(options->error);
@@ -167,7 +169,7 @@ int setMode(int mode)
 
 int setK(int k)
 {
-	if (k > 0)
+	if (k >=2)
 	{
 		options->k = k;
 		return 1;

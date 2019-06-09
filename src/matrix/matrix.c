@@ -591,3 +591,27 @@ matrix_t * proj(const matrix_t * matrix, const uint8_t mod) {
 
   return result;
 }
+
+matrix_t * append(const matrix_t * m1, const matrix_t * m2)
+{
+  if(NULL == m1 || NULL == m2 || m1->rows != m2->rows)
+    return NULL;
+  matrix_t * ret = create(m1->rows, m1->columns + m2->columns);
+  // copy first matrix
+  for (uint8_t i = 0; i < m1->rows; i++)
+  {
+    for(uint8_t j = 0; j < m1->columns; j++)
+    {
+      ret->data[i][j] = m1->data[i][j];
+    }
+  }
+  // copy second matrix
+  for (uint8_t i = 0; i < m1->rows; i++)
+  {
+    for(uint8_t j = m1->columns; j < m2->columns + m1->columns; j++)
+    {
+      ret->data[i][j] = m2->data[i][j - m1->columns];
+    }
+  }
+  return ret;
+}
