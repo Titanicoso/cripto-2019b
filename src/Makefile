@@ -6,7 +6,7 @@ INC_PARAMS=$(DEPSFOLDER:%=-I%)
 
 all: main matrix bmp random steganography app 
 
-fromzero: clean all ; ./app
+fromzero: clean all ; ./app –d –s "../Archivos de Prueba-4-8/Secreto.bmp" –m "../Archivos de Prueba-4-8/Marca.bmp" –k 4 –n 8 –dir "../Archivos de Prueba-4-8/shares"
 
 main:
 	cd main; make all
