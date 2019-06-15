@@ -91,18 +91,6 @@ int execute(options_st * options)
 		case RECOVERY_MODE: //recoverSecret(); break;
 		default: exit(0);
 	}
-	
-	//matrix_t * matrix = read_bmp("backtofutureshare.bmp", true);
-    //printf("%d %d\n", matrix->rows, matrix->columns);
-	/*
-    int i, j;
-    for (i = 0; i < matrix->rows; i++) {
-        for (j = 0; j < matrix->columns; j++) {
-            printf("%.2x ", matrix->data[i][j]);
-        }
-        printf("\n");
-    }
-	*/
 	return 0;
 }
 
