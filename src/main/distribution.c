@@ -10,6 +10,7 @@
 #define MAX 50 
 #define MOD ((uint8_t) 251) // closes prime
 #define MATRIX_X_COLS 1
+#define RW_FILE "Rw.bmp"
 
 // seed must be 48 bits;
 int64_t seed; 
@@ -27,10 +28,14 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     matrix_t ** V = createVMatrices(A, X, n);
     matrix_t ** G = createGMatrices(R, k, n, n); // m = n
     matrix_t ** Sh = createShMatrices(V, G, n);
+    Sh[0] = Sh[0];
+    // do steganography;
     BITMAP * watermark_image = read_bmp(watermark, false);
     matrix_t * W = watermark_image->matrix;
     matrix_t * Rw = substract(W, Sproj, MOD);
-
+    delete(watermark_image->matrix);
+    watermark_image->matrix = Rw;
+    write_bmp(RW_FILE, watermark_image);
     return 1;
 }
 
@@ -47,22 +52,63 @@ matrix_t ** createShMatrices(matrix_t ** V, matrix_t ** G, uint8_t n)
 matrix_t ** createGMatrices(matrix_t * R, uint8_t k, uint8_t n, uint8_t m)
 {
     int c;
-    size_t cols = (size_t) ceil(((double)m)/k);
     matrix_t ** Gs = calloc(n, sizeof(matrix_t*));
+    matrix_t ** RCols = getRColumns(R);
     for (uint8_t i = 0; i < n; i++)
     {
         c = i + 1;
-        fillGMatrix(Gs[i], R, k, c);
+        Gs[i] = createGMatrix(RCols, k, m, c);
     }
+    deleteRColumns(R->columns, RCols);
     return Gs;
 }
 
-void fillGMatrix(matrix_t * G, matrix_t * R, uint8_t k, int c)
+matrix_t ** getRColumns(matrix_t * R)
 {
-    for (uint8_t i = 0; i < G->rows; i++)
+    matrix_t ** RCols = calloc(R->columns, sizeof(matrix_t *));
+    for (size_t i = 0; i < R->columns; i++)
     {
-        getColumn(R, i);
+        RCols[i] = getColumn(R, i);
     }
+    return RCols;
+}
+
+void deleteRColumns(size_t columns, matrix_t ** RCols)
+{
+    for (size_t i = 0; i < columns; i++)
+    {
+       delete(RCols[i]);
+    }
+    free(RCols);
+}
+
+// THIS IS HORRIBLE
+matrix_t * createGMatrix(matrix_t ** RCols, uint8_t k, uint8_t m, int c)
+{
+    size_t t = (size_t) ceil(((double)m)/k);
+    matrix_t * col = NULL;
+    matrix_t * prev = NULL;
+    for (uint8_t i = 0; i < t; i++)
+    {
+        col = create(RCols[0]->rows, 1); // to save sum
+        for (uint8_t j = 0; j < k; j++)
+        {
+            // grab column I(i, k(t-1) + j))
+            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) pow(c, j), MOD);
+            sumInPlace(col, RixC, MOD);
+            delete(RixC);
+        }
+        if (prev != NULL)
+        {
+            matrix_t * aux = augment(prev, col);
+            delete(prev);
+            delete(col);
+            prev = aux;
+        }
+        else
+            prev = col;
+    }
+    return prev;
 }
 
 matrix_t ** createVMatrices(matrix_t * A, matrix_t ** X, uint8_t n)

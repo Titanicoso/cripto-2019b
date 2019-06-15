@@ -137,6 +137,24 @@ matrix_t * sum(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
   return result;
 }
 
+matrix_t * sumInPlace(matrix_t * m1, const matrix_t * m2, uint8_t mod)
+{
+
+  if(NULL == m1 || NULL == m2)
+    return NULL;
+
+  if(m1->columns != m2->columns || m1->rows != m2->rows)
+    return NULL;
+
+  size_t columns = m1->columns;
+  size_t rows = m1->rows;
+  size_t i;
+  for (i = 0; i < rows; i++) {
+    rowSum(m1->data[i], m2->data[i], m1->data[i], mod, columns);
+  }
+  return m1;
+}
+
 matrix_t * substract(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
 
   if(NULL == m1 || NULL == m2)
@@ -189,7 +207,8 @@ matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
   return result;
 }
 
-matrix_t * multiplyByScalar(const matrix_t * m1, const uint8_t scalar, uint8_t mod) {
+matrix_t * multiplyByScalar(const matrix_t * m1, const uint8_t scalar, uint8_t mod)
+{
 
   if(NULL == m1)
     return NULL;

@@ -43,7 +43,7 @@ BITMAP * read_bmp(const char * filename, bool color_bmp)
     fseek(file_ptr, bitmap->file_header.bfOffBits, SEEK_SET);
 
     //read in the bitmap image data
-    int i, j;
+    size_t i, j;
     for (i = 0; i < bitmap->matrix->rows; i++) 
     {
         for (j = 0; j < bitmap->matrix->columns; j++) 
@@ -77,7 +77,7 @@ void write_bmp(const char * filename, BITMAP * bitmap) {
         fwrite(bitmap->metadata, bitmap->metadata_length, 1, file_ptr);
     }
 
-    int i, j;
+    size_t i, j;
     for (i = 0; i < bitmap->matrix->rows; i++) 
     {
         for (j = 0; j < bitmap->matrix->columns; j++) 

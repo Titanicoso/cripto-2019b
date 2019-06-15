@@ -13,6 +13,8 @@
 #include "recovery.h"
 #include "distribution.h"
 
+options_st * options;
+
 int 
 main(int argc, char* argv[])
 {
@@ -62,19 +64,23 @@ main(int argc, char* argv[])
 				break;
 		}
 	}
-	if (options->k > options->n)
-		printError("k should be less or equal to n");
+	if (argv[optind] == NULL) 
+	{
+		printHelp();
+		return EXIT_SUCCESS;
+	}
 	if (!valid)
 	{
 		printError(options->error);
+		return EXIT_FAILURE;
 	}
-	else
+	if (options->k > options->n)
 	{
-		execute(options);
+		printError("k should be less or equal to n");
+		return EXIT_FAILURE;
 	}
-	if (argv[optind] == NULL) 
-  		printHelp();
-    return EXIT_SUCCESS;
+	execute(options);
+	return EXIT_SUCCESS;
 }
 
 int execute(options_st * options)
@@ -82,7 +88,7 @@ int execute(options_st * options)
 	switch(options->mode)
 	{
 		case DISTRIBUTION_MODE: distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
-		case RECOVERY_MODE: recoverSecret(); break;
+		case RECOVERY_MODE: //recoverSecret(); break;
 		default: exit(0);
 	}
 	

@@ -1,10 +1,10 @@
 include Makefile.inc
-OBJECTS = $(wildcard ./*/.o)
+OBJECTS = $(wildcard ./*/*.o)
 DEPS = $(wildcard ./*/include/*.h)
 DEPSFOLDER = $(wildcard ../*/include)
 INC_PARAMS=$(DEPSFOLDER:%=-I%)
 
-all: main matrix steganography linkup app bmp
+all: main matrix bmp random steganography app 
 
 fromzero: clean all ; ./app
 
@@ -34,4 +34,4 @@ clean:
 	cd random; make clean
 	cd bmp; make clean
 
-.PHONY: all clean fromzero main steganography matrix app
+.PHONY: all clean fromzero bmp random main steganography matrix app
