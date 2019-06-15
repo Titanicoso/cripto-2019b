@@ -10,7 +10,7 @@
 
 #pragma pack(push, 1)
 
-typedef struct tagBITMAPFILEHEADER
+typedef struct
 {
     uint16_t bfType;  //specifies the file type
     uint32_t bfSize;  //specifies the size in bytes of the bitmap file
@@ -19,7 +19,7 @@ typedef struct tagBITMAPFILEHEADER
     uint32_t bfOffBits;  //species the offset in bytes from the BITMAPFILEHEADER to the bitmap bits
 } BITMAPFILEHEADER;
 
-typedef struct tagBITMAPINFOHEADER
+typedef struct
 {
     uint32_t biSize;  //specifies the number of bytes required by the struct
     uint32_t biWidth;  //specifies width in pixels
@@ -34,8 +34,19 @@ typedef struct tagBITMAPINFOHEADER
     uint32_t biClrImportant;  //number of colors that are important
 } BITMAPINFOHEADER;
 
+typedef struct
+{
+    BITMAPFILEHEADER file_header;
+    BITMAPINFOHEADER info_header;
+    uint8_t * metadata;
+    size_t metadata_length;
+    matrix_t * matrix;
+} BITMAP;
+
 #pragma pack(pop)
 
-matrix_t * read_bmp(const char * filename, bool color_bmp);
+BITMAP * read_bmp(const char * filename, bool color_bmp);
+void write_bmp(const char * filename, BITMAP * bitmap);
+void free_bmp(BITMAP * bitmap);
 
 #endif

@@ -1,52 +1,98 @@
 #include "bmp.h"
 
-matrix_t * read_bmp(const char * filename, bool color_bmp)
+BITMAP * read_bmp(const char * filename, bool color_bmp)
 {
     FILE * file_ptr;
-    BITMAPFILEHEADER bitmap_file_header;
-    BITMAPINFOHEADER bitmap_info_header;
-    matrix_t * matrix;
-    int pixel_size;
-    if (color_bmp) {
-        pixel_size = 3;
-    } else {
-        pixel_size = 1;
-    }
+    BITMAP * bitmap;
+    int pixel_size = color_bmp ? 3 : 1;
 
     //open filename in read binary mode
-    file_ptr = fopen(filename,"rb");
+    file_ptr = fopen(filename, "rb");
     if (file_ptr == NULL)
         return NULL;
 
+    bitmap = calloc(1, sizeof(BITMAP));
+    if (bitmap == NULL)
+        return NULL;
+
     //read the bitmap file header
-    fread(&bitmap_file_header, sizeof(BITMAPFILEHEADER), 1, file_ptr);
+    fread(&bitmap->file_header, sizeof(BITMAPFILEHEADER), 1, file_ptr);
 
     //verify that this is a bmp file by check bitmap id
-    if (bitmap_file_header.bfType != 0x4D42)
+    if (bitmap->file_header.bfType != 0x4D42)
     {
         fclose(file_ptr);
+        free(bitmap);
         return NULL;
     }
 
     //read the bitmap info header
-    fread(&bitmap_info_header, sizeof(BITMAPINFOHEADER), 1 , file_ptr);
+    fread(&bitmap->info_header, sizeof(BITMAPINFOHEADER), 1, file_ptr);
 
-    matrix = create(bitmap_info_header.biHeight, bitmap_info_header.biWidth * pixel_size);
+    //read metadata between header and matrix
+    if (bitmap->file_header.bfOffBits > sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)) 
+    {
+        bitmap->metadata_length = bitmap->file_header.bfOffBits - (sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
+        bitmap->metadata = malloc(bitmap->metadata_length);
+        fread(bitmap->metadata, bitmap->metadata_length, 1, file_ptr);
+    }
+
+    bitmap->matrix = create(bitmap->info_header.biHeight, bitmap->info_header.biWidth * pixel_size);
 
     //move file point to the beginning of bitmap data
-    fseek(file_ptr, bitmap_file_header.bfOffBits, SEEK_SET);
+    fseek(file_ptr, bitmap->file_header.bfOffBits, SEEK_SET);
 
     //read in the bitmap image data
     int i, j;
-    for (i = 0; i < matrix->rows; i++) {
-        for (j = 0; j < matrix->columns; j++) {
-            fread(&(matrix->data[i][j]), 1, 1, file_ptr);
-            if (matrix->data[i][j] > 250)
-                matrix->data[i][j] = 250;
+    for (i = 0; i < bitmap->matrix->rows; i++) 
+    {
+        for (j = 0; j < bitmap->matrix->columns; j++) 
+        {
+            fread(&bitmap->matrix->data[i][j], 1, 1, file_ptr);
+            if (bitmap->matrix->data[i][j] > 250)
+                bitmap->matrix->data[i][j] = 250;
         }
     }
 
     //close file and return bitmap image data
     fclose(file_ptr);
-    return matrix;
+    return bitmap;
+}
+
+void write_bmp(const char * filename, BITMAP * bitmap) {
+    FILE * file_ptr;
+
+    if (bitmap == NULL)
+        return;
+
+    //open filename in write binary mode
+    file_ptr = fopen(filename, "wb");
+    if (file_ptr == NULL)
+        return;
+
+    fwrite(&bitmap->file_header, sizeof(BITMAPFILEHEADER), 1, file_ptr);
+    fwrite(&bitmap->info_header, sizeof(BITMAPINFOHEADER), 1, file_ptr);
+    if (bitmap->metadata_length != 0) 
+    {
+        fwrite(bitmap->metadata, bitmap->metadata_length, 1, file_ptr);
+    }
+
+    int i, j;
+    for (i = 0; i < bitmap->matrix->rows; i++) 
+    {
+        for (j = 0; j < bitmap->matrix->columns; j++) 
+        {
+            fwrite(&bitmap->matrix->data[i][j], 1, 1, file_ptr);
+        }
+    }
+
+    //close file and return
+    fclose(file_ptr);
+    return;
+}
+
+void free_bmp(BITMAP * bitmap) {
+    delete(bitmap->matrix);
+    free(bitmap->metadata);
+    free(bitmap);
 }
