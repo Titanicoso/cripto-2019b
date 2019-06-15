@@ -2,9 +2,9 @@
 
 void printWelcome()
 {
-    printf("Welcome to the sec program\n");
-    printf("Made by Agustín Calatayúd, Diego Bruno Cillia y Lóránt Mikolás\n");
-    printf("Excecute with option -h for help\n");
+    printf("Welcome to the security program\n");
+    printf("Made by Agustín Calatayud, Diego Bruno Cilla y Lóránt Mikolás\n");
+    printf("Execute with option -h for help\n");
     printf("Reading options and starting...\n\n");
 }
 
