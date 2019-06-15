@@ -21,10 +21,10 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     matrix_t * S = read_bmp(image, false);
     matrix_t * A  = createAMatrix(k, n);
     matrix_t * Sproj = proj(A, MOD);
-    matrix_t * R = substract(Sproj, S, MOD);
+    matrix_t * R = substract(S, Sproj, MOD);
     matrix_t ** X = createXMatrices(k, n);
     matrix_t ** V = createVMatrices(A, X, n);
-    matrix_t ** G = createGMatrices(R, V, n);
+    matrix_t ** G = createGMatrices(R, k, n, n); // m = n
     matrix_t ** Sh = createShMatrices(V, G, n);
     // Generate watermark and make remainder Rw public
     matrix_t * W = read_bmp(image, false);
@@ -43,13 +43,25 @@ matrix_t ** createShMatrices(matrix_t ** V, matrix_t ** G, uint8_t n)
     return Sh;
 }
 
-matrix_t ** createGMatrices(matrix_t * A, matrix_t ** V, uint8_t n)
+matrix_t ** createGMatrices(matrix_t * R, uint8_t k, uint8_t n, uint8_t m)
 {
+    int c;
+    size_t cols = (size_t) ceil(((double)m)/k);
+    matrix_t ** Gs = calloc(n, sizeof(matrix_t*));
     for (uint8_t i = 0; i < n; i++)
     {
-        // TODO: complete
+        c = i + 1;
+        fillGMatrix(Gs[i], R, k, c);
     }
-    return NULL;
+    return Gs;
+}
+
+void fillGMatrix(matrix_t * G, matrix_t * R, uint8_t k, int c)
+{
+    for (uint8_t i = 0; i < G->rows; i++)
+    {
+        getColumn(R, i);
+    }
 }
 
 matrix_t ** createVMatrices(matrix_t * A, matrix_t ** X, uint8_t n)
@@ -105,7 +117,7 @@ bool isValueInArray(uint8_t * array, uint8_t value, int size)
 matrix_t * createAMatrix(uint8_t k, uint8_t n)
 {
     matrix_t * A = NULL, * At = NULL, * aux = NULL;
-    int m =  2 * (k - 1); // TODO: revise this
+    int m = n; // TODO: revise this
     A = create(m, k);
     do 
     {   

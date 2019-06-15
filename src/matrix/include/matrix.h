@@ -43,4 +43,6 @@ matrix_t * proj(const matrix_t * matrix, const uint8_t mod);
 
 matrix_t * augment(const matrix_t * m1, const matrix_t * m2);
 
+matrix_t * getColumn(const matrix_t * matrix, uint8_t column);
+
 #endif

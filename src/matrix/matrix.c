@@ -592,3 +592,8 @@ matrix_t * proj(const matrix_t * matrix, const uint8_t mod) {
 
   return result;
 }
+
+matrix_t * getColumn(const matrix_t * matrix, uint8_t column)
+{
+  return reduce(matrix, 0, matrix->rows, column, column + 1);
+}
