@@ -18,7 +18,8 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
 {
     setSeed(SET);
     generateModInverses(MOD);
-    matrix_t * S = read_bmp(image, false);
+    BITMAP * secret_image = read_bmp(image, false);
+    matrix_t * S = secret_image->matrix;
     matrix_t * A  = createAMatrix(k, n);
     matrix_t * Sproj = proj(A, MOD);
     matrix_t * R = substract(S, Sproj, MOD);
@@ -26,8 +27,8 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     matrix_t ** V = createVMatrices(A, X, n);
     matrix_t ** G = createGMatrices(R, k, n, n); // m = n
     matrix_t ** Sh = createShMatrices(V, G, n);
-    // Generate watermark and make remainder Rw public
-    matrix_t * W = read_bmp(image, false);
+    BITMAP * watermark_image = read_bmp(watermark, false);
+    matrix_t * W = watermark_image->matrix;
     matrix_t * Rw = substract(W, Sproj, MOD);
 
     return 1;

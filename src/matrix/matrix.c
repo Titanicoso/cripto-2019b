@@ -189,6 +189,24 @@ matrix_t * multiply(const matrix_t * m1, const matrix_t * m2, uint8_t mod) {
   return result;
 }
 
+matrix_t * multiplyByScalar(const matrix_t * m1, const uint8_t scalar, uint8_t mod) {
+
+  if(NULL == m1)
+    return NULL;
+
+  matrix_t * result = create(m1->rows, m1->columns);
+
+  if(NULL == result)
+    return NULL;
+
+  size_t i;
+  for (i = 0; i < m1->rows; i++) {
+    rowTimesScalar(m1->data[i], result->data[i], mod, m1->columns, scalar);
+  }
+
+  return result;
+}
+
 matrix_t * transpose(const matrix_t * m) {
 
   if(NULL == m)
