@@ -48,7 +48,7 @@ void distribute_bits(matrix_t * Sh, BITMAP * bitmap, uint8_t bits, uint8_t mask)
         {
             for (bit = 0; bit < 8; bit += bits)
             {
-                uint8_t bit_value = (Sh->data[i][j] >> bit) & mask;
+                uint8_t bit_value = (Sh->data[i][j] >> (7 - bit)) & mask;
                 bitmap->matrix->data[bitmap_i][bitmap_j] = (bitmap->matrix->data[bitmap_i][bitmap_j] & ~mask) | bit_value;
 
                 bitmap_j++;
