@@ -1,6 +1,6 @@
 #include "steganography.h"
 
-void distribute_shares(const matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n) 
+void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
 {
 	DIR * folder;
     struct dirent * entry;
@@ -39,9 +39,9 @@ void distribute_shares(const matrix_t ** Sh, const char * dir, uint8_t k, uint8_
 
 void distribute_bits(const matrix_t * Sh, BITMAP * bitmap, uint8_t bits, uint8_t mask) 
 {
-    int bitmap_i = 0, bitmap_j = 0;
+    size_t bitmap_i = 0, bitmap_j = 0;
 
-    int i, j, bit;
+    size_t i, j, bit;
     for (i = 0; i < Sh->rows; i++) 
     {
         for (j = 0; j < Sh->columns; j++) 
@@ -66,5 +66,5 @@ void distribute_bits(const matrix_t * Sh, BITMAP * bitmap, uint8_t bits, uint8_t
 
 matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
 {
-    
+    return NULL;
 }

@@ -49,4 +49,8 @@ matrix_t * sumInPlace(matrix_t * m1, const matrix_t * m2, uint8_t mod);
 
 matrix_t * multiplyByScalar(const matrix_t * m1, const uint8_t scalar, uint8_t mod);
 
+matrix_t ** getNxNMatrices(matrix_t * matrix, uint8_t n, size_t *count);
+
+matrix_t * joinMatrices(matrix_t ** matrices, size_t count, size_t rows, size_t columns);
+
 #endif

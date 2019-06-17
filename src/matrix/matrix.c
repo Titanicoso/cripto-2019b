@@ -634,3 +634,109 @@ matrix_t * getColumn(const matrix_t * matrix, uint8_t column)
 {
   return reduce(matrix, 0, matrix->rows, column, column + 1);
 }
+
+matrix_t * getNxNMatrix(matrix_t * matrix, uint8_t n, size_t count)
+{
+
+  if(NULL == matrix || 0 == n)
+    return NULL;
+
+  size_t j, k;
+  size_t matrixRow = count / matrix->rows;
+  size_t matrixCol = count % matrix->columns;
+  matrix_t * result = create(n, n);
+
+  if(NULL == result)
+    return NULL;
+
+  for (j = 0; j < n ; j++)
+  {
+    for (k = 0; k < n ; k++)
+    {
+      result->data[j][k] = matrix->data[matrixRow][matrixCol];
+      matrixCol++;
+      if(matrixCol == matrix->columns)
+      {
+        matrixRow++;
+        matrixCol = 0;
+      }
+    }
+  }
+
+  return result;
+}
+
+matrix_t ** getNxNMatrices(matrix_t * matrix, uint8_t n, size_t *count)
+{
+
+  if(NULL == matrix || 0 == n || NULL == count)
+    return NULL;
+
+  if((matrix->columns * matrix->rows % (n * n)) != 0)
+    return NULL;
+
+  *count = (matrix->columns * matrix->rows) / (n * n);
+
+  matrix_t ** matrices = calloc(*count, sizeof(matrix_t*));
+
+  if(NULL == matrices)
+    return NULL;
+
+  size_t i, j = 0;
+  for (i = 0; i < *count; i++)
+  {
+    matrices[i] = getNxNMatrix(matrix, n, j);
+    j += n * n;
+  }
+
+  return matrices;
+}
+
+matrix_t * joinMatrix(matrix_t * m1, matrix_t * m2, size_t count)
+{
+
+  if(NULL == m1 || (count + m2->rows * m2->columns > m1->rows * m1->columns))
+    return NULL;
+
+  size_t i, j;
+  size_t matrixRow = count / m1->rows;
+  size_t matrixCol = count % m1->columns;
+
+  for (i = 0; i < m2->rows ; i++)
+  {
+    for (j = 0; j < m2->columns ; j++)
+    {
+      m1->data[matrixRow][matrixCol] = m2->data[i][j];
+      matrixCol++;
+      if(matrixCol == m1->columns)
+      {
+        matrixRow++;
+        matrixCol = 0;
+      }
+    }
+  }
+
+  return m1;
+}
+
+matrix_t * joinMatrices(matrix_t ** matrices, size_t count, size_t rows, size_t columns)
+{
+
+  if(NULL == matrices)
+    return NULL;
+
+  matrix_t * matrix = create(rows, columns);
+
+  if(NULL == matrix)
+    return NULL;
+
+  size_t i;
+  size_t j = 0;
+  for (i = 0; i < count; i++)
+  {
+    matrix = joinMatrix(matrix, matrices[i], j);
+    j += matrices[i]->rows * matrices[i]->columns;
+  }
+
+  return matrix;
+}
