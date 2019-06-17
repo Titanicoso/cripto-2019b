@@ -117,7 +117,7 @@ void recover_bits(matrix_t * Sh, BITMAP * bitmap, uint8_t bits, uint8_t mask)
             for (bit = 0; bit < 8; bit += bits)
             {
                 uint8_t bit_value = bitmap->matrix->data[bitmap_i][bitmap_j] & mask;
-                byte_value = (byte_value | bit_value) << bits;
+                byte_value = (byte_value << bits) | bit_value;
 
                 bitmap_j++;
                 if (bitmap_j == bitmap->matrix->columns)
