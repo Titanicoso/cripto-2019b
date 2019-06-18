@@ -5,6 +5,9 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
 	DIR * folder;
     struct dirent * entry;
 
+    if (!(k == 4 && n == 8) && !(k == 2 && n == 4))
+        return;
+
     folder = opendir(dir);
     if (folder == NULL)
         return;
@@ -12,21 +15,25 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
     int entry_index = 0;
     while ((entry = readdir(folder)) != NULL) 
     {
-        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..")) 
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) 
         {
-            BITMAP * bitmap = read_bmp(entry->d_name, true);
+            char * path = malloc(strlen(dir) + 1 + strlen(entry->d_name) + 1);
+            sprintf(path, "%s/%s", dir, entry->d_name);
+            BITMAP * bitmap = read_bmp(path, true);
+            if (bitmap == NULL) {
+                free(path);
+                free_bmp(bitmap);
+                continue;
+            }
+
             if (k == 4 && n == 8)
                 distribute_bits(Sh[entry_index], bitmap, 1, 0x1);
             else if (k == 2 && n == 4)
                 distribute_bits(Sh[entry_index], bitmap, 2, 0x3);
-            else 
-            {
-                free_bmp(bitmap);
-                closedir(folder);
-                return;
-            }
+
             bitmap->file_header.bfReserved1 = entry_index;
-            write_bmp(entry->d_name, bitmap);
+            write_bmp(path, bitmap);
+            free(path);
             free_bmp(bitmap);
 
             entry_index++;
@@ -69,6 +76,9 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
     DIR * folder;
     struct dirent * entry;
 
+    if (!(k == 4 && n == 8) && !(k == 2 && n == 4))
+        return NULL;
+
     folder = opendir(dir);
     if (folder == NULL)
         return NULL;
@@ -77,25 +87,25 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
 
     while ((entry = readdir(folder)) != NULL) 
     {
-        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..")) 
+        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) 
         {
-            BITMAP * bitmap = read_bmp(entry->d_name, true);
+            char * path = malloc(strlen(dir) + 1 + strlen(entry->d_name) + 1);
+            sprintf(path, "%s/%s", dir, entry->d_name);
+            BITMAP * bitmap = read_bmp(path, true);
+            if (bitmap == NULL) {
+                free(path);
+                free_bmp(bitmap);
+                continue;
+            }
+
             matrix_t * Sh = create(1, bitmap->info_header.biWidth * bitmap->info_header.biHeight * 3 / n);
             if (k == 4 && n == 8)
                 recover_bits(Sh, bitmap, 1, 0x1);
             else if (k == 2 && n == 4)
                 recover_bits(Sh, bitmap, 2, 0x3);
-            else 
-            {
-                for (size_t i = 0; i < n; i++) {
-                   delete(shares[i]);
-                }
-                free(shares);
-                free_bmp(bitmap);
-                closedir(folder);
-                return NULL;
-            }
+
             shares[bitmap->file_header.bfReserved1] = Sh;
+            free(path);
             free_bmp(bitmap);
         }
     }
