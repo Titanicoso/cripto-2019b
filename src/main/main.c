@@ -67,14 +67,14 @@ main(int argc, char* argv[])
 	}
 	if (argv[optind] == NULL) 
 	{
-		free(options);
 		printHelp();
+		free(options);
 		return EXIT_SUCCESS;
 	}
 	if (!valid)
 	{
-		free(options);
 		printError(options->error);
+		free(options);
 		return EXIT_FAILURE;
 	}
 	if (options->k > options->n)
