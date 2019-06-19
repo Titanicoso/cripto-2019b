@@ -19,6 +19,7 @@ int
 main(int argc, char* argv[])
 {
 	printWelcome();
+	options = malloc(sizeof(*options));
     char option;
 	int valid = 1;
 	while(valid && (option = getopt(argc, argv, "d:r:s:m:k:n:i:h")) != -1)
@@ -66,20 +67,24 @@ main(int argc, char* argv[])
 	}
 	if (argv[optind] == NULL) 
 	{
+		free(options);
 		printHelp();
 		return EXIT_SUCCESS;
 	}
 	if (!valid)
 	{
+		free(options);
 		printError(options->error);
 		return EXIT_FAILURE;
 	}
 	if (options->k > options->n)
 	{
 		printError("k should be less or equal to n");
+		free(options);
 		return EXIT_FAILURE;
 	}
 	execute(options);
+	free(options);
 	return EXIT_SUCCESS;
 }
 
