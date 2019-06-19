@@ -31,7 +31,7 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
             else if (k == 2 && n == 4)
                 distribute_bits(Sh[entry_index], bitmap, 2, 0x3);
 
-            bitmap->file_header.bfReserved1 = entry_index;
+            bitmap->file_header.bfReserved1 = entry_index + 1;
             write_bmp(path, bitmap);
             free(path);
             free_bmp(bitmap);
@@ -104,7 +104,7 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
             else if (k == 2 && n == 4)
                 recover_bits(Sh, bitmap, 2, 0x3);
 
-            shares[bitmap->file_header.bfReserved1] = Sh;
+            shares[bitmap->file_header.bfReserved1 - 1] = Sh;
             free(path);
             free_bmp(bitmap);
         }
