@@ -5,6 +5,6 @@
 
 int64_t setSeed(int64_t s);
 
-uint8_t nextChar(int64_t seed);
+uint8_t nextChar(int64_t* seed);
 
 #endif

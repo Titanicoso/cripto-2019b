@@ -13,7 +13,7 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
         return;
 
     int entry_index = 0;
-    while ((entry = readdir(folder)) != NULL) 
+    while ((entry = readdir(folder)) != NULL && entry_index < n)
     {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) 
         {
@@ -22,7 +22,6 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
             BITMAP * bitmap = read_bmp(path, true);
             if (bitmap == NULL) {
                 free(path);
-                free_bmp(bitmap);
                 continue;
             }
 
@@ -85,7 +84,8 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
 
     matrix_t ** shares = calloc(n, sizeof(matrix_t *));
 
-    while ((entry = readdir(folder)) != NULL) 
+    int entry_index = 0;
+    while ((entry = readdir(folder)) != NULL && entry_index < n)
     {
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) 
         {
@@ -94,7 +94,6 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
             BITMAP * bitmap = read_bmp(path, true);
             if (bitmap == NULL) {
                 free(path);
-                free_bmp(bitmap);
                 continue;
             }
 
@@ -107,6 +106,8 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
             shares[bitmap->file_header.bfReserved1 - 1] = Sh;
             free(path);
             free_bmp(bitmap);
+
+            entry_index++;
         }
     }
 

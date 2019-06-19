@@ -699,7 +699,7 @@ matrix_t * joinMatrix(matrix_t * m1, matrix_t * m2, size_t count)
     return NULL;
 
   size_t i, j;
-  size_t matrixRow = count / m1->rows;
+  size_t matrixRow = count / m1->columns;
   size_t matrixCol = count % m1->columns;
 
   for (i = 0; i < m2->rows ; i++)

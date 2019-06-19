@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <time.h>
 #include "distribution.h"
 #include "steganography.h"
 #include "matrix.h"
@@ -18,7 +19,7 @@ int64_t seed;
 
 int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * watermark)
 {
-    setSeed(SET);
+    seed = setSeed(time(NULL));
     generateModInverses(MOD);
     BITMAP * secret_image = read_bmp(image, false);
     BITMAP * watermark_image = read_bmp(watermark, false);
@@ -28,41 +29,40 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     matrix_t ** watermarkMatrices = getNxNMatrices(watermark_image->matrix, n, &watermarkCount);
     matrix_t *** shares = calloc(n, sizeof(matrix_t **));
     for (int i = 0; i < n; i++) {
-      shares[i] = calloc(secretCount, sizeof(matrix_t **));
+        shares[i] = calloc(secretCount, sizeof(matrix_t **));
     }
     matrix_t ** watermarkRw = calloc(watermarkCount, sizeof(matrix_t *));
 
     for(size_t i = 0; i < secretCount; i++) {
-      matrix_t * S = secretMatrices[i];
-      matrix_t * A  = createAMatrix(k, n);
-      matrix_t * Sproj = proj(A, MOD);
-      matrix_t * R = substract(S, Sproj, MOD);
-      matrix_t ** X = createXMatrices(k, n);
-      matrix_t ** V = createVMatrices(A, X, n);
-      matrix_t ** G = createGMatrices(R, k, n, n); // m = n
-      matrix_t ** Sh = createShMatrices(V, G, n);
-      joinSh(shares, Sh, n, i); // save them all for later
-      matrix_t * W = watermarkMatrices[i];
-      watermarkRw[i] = substract(W, Sproj, MOD); // save them all for later
+        matrix_t * S = secretMatrices[i];
+        matrix_t * A  = createAMatrix(k, n);
+        matrix_t * Sproj = proj(A, MOD);
+        matrix_t * R = substract(S, Sproj, MOD);
+        matrix_t ** X = createXMatrices(k, n);
+        matrix_t ** V = createVMatrices(A, X, n);
+        matrix_t ** G = createGMatrices(R, k, n, n); // m = n
+        matrix_t ** Sh = createShMatrices(V, G, n);
+        joinSh(shares, Sh, n, i); // save them all for later
+        matrix_t * W = watermarkMatrices[i];
+        watermarkRw[i] = substract(W, Sproj, MOD); // save them all for later
 
-      delete(S);
-      delete(A);
-      delete(Sproj);
-      delete(R);
-      deleteMatrices(n, X);
-      deleteMatrices(n, V);
-      deleteMatrices(n, G);
-      deleteMatrices(n, Sh);
-      delete(W);
+        delete(S);
+        delete(A);
+        delete(Sproj);
+        delete(R);
+        deleteMatrices(n, X);
+        deleteMatrices(n, V);
+        deleteMatrices(n, G);
+        delete(W);
     }
-    deleteMatrices(secretCount, secretMatrices);
-    deleteMatrices(watermarkCount, watermarkMatrices);
+    free(secretMatrices);
+    free(watermarkMatrices);
 
     matrix_t ** ShMatrices = joinFinalShMatrices(shares, n, secretCount, 1, shares[0][0]->rows * shares[0][0]->columns * secretCount);
     matrix_t * Rw = joinMatrices(watermarkRw, watermarkCount, watermark_image->matrix->rows, watermark_image->matrix->columns);
 
     for (int i = 0; i < n; i++) {
-      deleteMatrices(secretCount, shares[i]);
+        deleteMatrices(secretCount, shares[i]);
     }
     deleteMatrices(watermarkCount, watermarkRw);
 
@@ -73,7 +73,6 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     write_bmp(RW_FILE, watermark_image);
 
     deleteMatrices(n, ShMatrices);
-    delete(Rw);
 
     free_bmp(watermark_image);
     free_bmp(secret_image);
@@ -200,7 +199,7 @@ uint8_t * generateAValues(uint8_t n)
     {
         while (aAlreadyPresent)
         {
-            a = nextChar(seed) % MOD; // 0, 1, 2, 3, 4 will be more likely check this
+            a = nextChar(&seed) % MOD; // 0, 1, 2, 3, 4 will be more likely check this
             aAlreadyPresent = isValueInArray(aValues, a, i);
         }
         aValues[i] = a;
@@ -222,17 +221,17 @@ matrix_t * createAMatrix(uint8_t k, uint8_t n)
 {
     matrix_t * A = NULL, * At = NULL, * aux = NULL;
     int m = n; // TODO: revise this
-    A = create(m, k);
     do 
     {   
         delete(At);
         delete(A);
         delete(aux);
-        At = transpose(A);
-        aux = multiply(A, At, MOD);
+        A = create(m, k);
         fillRandomMatrix(A);
+        At = transpose(A);
+        aux = multiply(At, A, MOD);
     }
-    while (getRank(aux, MOD) == n && getRank(A, MOD) != k);
+    while (getRank(aux, MOD) != k || getRank(A, MOD) != k);
     delete(aux);
     delete(At);
     return A;
@@ -244,7 +243,7 @@ void fillRandomMatrix(matrix_t * matrix)
     {
         for (uint8_t j = 0; j < matrix->columns; j++)
         {
-            matrix->data[i][j] = nextChar(seed) % MOD;
+            matrix->data[i][j] = nextChar(&seed) % MOD;
         }
     }
 }
