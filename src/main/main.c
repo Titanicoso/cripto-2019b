@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
+#include <getopt.h>
 #include "matrix.h"
 #include "bmp.h"
 #include "main.h"
@@ -15,15 +17,14 @@
 
 options_st * options;
 
-int 
-main(int argc, char* argv[])
+int main(int argc, char* const argv[])
 {
 	printWelcome();
 	options = malloc(sizeof(*options));
-    char option;
-	int valid = 1;
-	while(valid && (option = getopt(argc, argv, "d:r:s:m:k:n:i:h")) != -1)
+    int option, valid = 1;
+	while(valid && (option = getopt(argc, argv, "d:r:h:s:m:k:n:i")) != -1)
 	{
+		printf("a\n");
 		switch(option)
 		{
 			// secret image distribution
@@ -61,31 +62,31 @@ main(int argc, char* argv[])
 				printHelp();
 				break;
 			default:
-				exit(0);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
-	if (argv[optind] == NULL) 
+	if (optind >= argc || argv[optind] == NULL) 
 	{
 		printHelp();
 		free(options);
-		return EXIT_SUCCESS;
+		exit(EXIT_FAILURE);
 	}
 	if (!valid)
 	{
 		printError(options->error);
 		free(options);
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 	if (options->k > options->n)
 	{
 		printError("k should be less or equal to n");
 		free(options);
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 	execute(options);
 	free(options);
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }
 
 int execute(options_st * options)
@@ -101,6 +102,7 @@ int execute(options_st * options)
 
 int setImage(const char* image)
 {
+	printf("d\n");
 	if (fileExists(image))
 	{
 		options->image = image;
@@ -111,6 +113,7 @@ int setImage(const char* image)
 
 int setWatermark(const char* watermark)
 {
+	printf("d\n");
 	if (fileExists(watermark))
 	{
 		options->watermark = watermark;
@@ -121,6 +124,7 @@ int setWatermark(const char* watermark)
 
 int setDirectory(const char* directory)
 {
+	printf("d\n");
 	if (directoryExists(directory))
 	{
 		options->dir = directory;
@@ -132,6 +136,7 @@ int setDirectory(const char* directory)
 
 int directoryExists(const char* directory)
 {
+	printf("d\n");
 	DIR* dir = opendir(directory);
 	if (dir)
 	{
@@ -146,6 +151,7 @@ int directoryExists(const char* directory)
 
 int fileExists(const char * name)
 {
+	printf("d\n");
     FILE *file;
     if ((file = fopen(name, "r")))
 	{
@@ -157,6 +163,8 @@ int fileExists(const char * name)
 
 int setMode(int mode)
 {
+		printf("d\n");
+	printf("d\n");
 	if (mode != DISTRIBUTION_MODE && mode != RECOVERY_MODE)
 	{
 		options->error = "Error setting mode";
