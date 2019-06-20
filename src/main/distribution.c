@@ -184,9 +184,10 @@ uint8_t * generateAValues(uint8_t n)
 {
     uint8_t * aValues = calloc(n, sizeof(uint8_t));
     uint8_t a;
-    bool aAlreadyPresent = true;
+    bool aAlreadyPresent;
     for (int i = 0; i < n; i++)
     {
+        aAlreadyPresent = true;
         while (aAlreadyPresent)
         {
             a = nextChar(&seed) % MOD; // 0, 1, 2, 3, 4 will be more likely check this
@@ -210,7 +211,7 @@ bool isValueInArray(uint8_t * array, uint8_t value, int size)
 matrix_t * createAMatrix(uint8_t k, uint8_t n)
 {
     matrix_t * A = NULL, * At = NULL, * aux = NULL;
-    int m = n; // TODO: revise this
+    uint8_t m = n; // TODO: revise this
     do 
     {   
         delete(At);
