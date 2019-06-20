@@ -48,7 +48,6 @@ int recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, co
 
   matrix_t * watermarkMatrix = joinMatrices(watermark, watermarkCount, rows, columns);
   matrix_t * secretMatrix = joinMatrices(secret, secretCount, rows, columns);
-  print(secretMatrix);
 
   delete(rw_image->matrix);
   rw_image->matrix = secretMatrix;
@@ -113,7 +112,7 @@ matrix_t ** createGMatricesRecovery(matrix_t *** Sh, size_t secretIndex, uint8_t
   {
     if (Sh[i] != NULL)
     {
-      matrices[i] = reduce(Sh[i][secretIndex], 0, Sh[i][secretIndex]->rows, 1, Sh[i][secretIndex]->columns);
+      matrices[shares] = reduce(Sh[i][secretIndex], 0, Sh[i][secretIndex]->rows, 1, Sh[i][secretIndex]->columns);
       shares++;
     }
   }
@@ -123,11 +122,12 @@ matrix_t ** createGMatricesRecovery(matrix_t *** Sh, size_t secretIndex, uint8_t
 matrix_t * createRMatrixRecovery(matrix_t ** G, matrix_t * lefty, uint8_t n, uint8_t k)
 {
   matrix_t * R = NULL;
-  matrix_t ** results = calloc(n * k, sizeof(matrix_t*));
+  size_t columns = G[0]->columns;
+  matrix_t ** results = calloc(n * columns, sizeof(matrix_t*));
   size_t idx = 0;
   for (uint8_t i = 0; i < n; i++)
   {
-    for (uint8_t j = 0; j < k; j++)
+    for (uint8_t j = 0; j < columns; j++)
     {
       matrix_t * righty = createRightyMatrix(G, k, i, j);
       matrix_t * gaussy = augment(lefty, righty);
@@ -139,8 +139,8 @@ matrix_t * createRMatrixRecovery(matrix_t ** G, matrix_t * lefty, uint8_t n, uin
     }
   }
 
-  R = joinMatrices(results, n * k, n, n);
-  deleteMatrices(n * k, results);
+  R = joinMatrices(results, n * columns, n, n);
+  deleteMatrices(n * columns, results);
 
   return R;
 }
