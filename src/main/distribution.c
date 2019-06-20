@@ -4,12 +4,9 @@
 #include <time.h>
 #include "distribution.h"
 #include "steganography.h"
-#include "matrix.h"
 #include "random.h"
 #include "bmp.h"
 
-#define SET 10  // TODO: revise this, set with system clock
-#define MAX 50 
 #define MOD ((uint8_t) 251) // closes prime
 #define MATRIX_X_COLS 1
 #define RW_FILE "Rw.bmp"
@@ -17,6 +14,7 @@
 // seed must be 48 bits;
 int64_t seed; 
 
+//TODO: Show errors
 int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * watermark)
 {
     seed = setSeed(time(NULL));
@@ -25,8 +23,8 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     BITMAP * watermark_image = read_bmp(watermark, false);
     size_t secretCount = 0;
     size_t watermarkCount = 0;
-    matrix_t ** secretMatrices = getNxNMatrices(secret_image->matrix, n, &secretCount);
-    matrix_t ** watermarkMatrices = getNxNMatrices(watermark_image->matrix, n, &watermarkCount);
+    matrix_t ** secretMatrices = getNxMMatrices(secret_image->matrix, n, n, &secretCount);
+    matrix_t ** watermarkMatrices = getNxMMatrices(watermark_image->matrix, n, n, &watermarkCount);
     matrix_t *** shares = calloc(n, sizeof(matrix_t **));
     for (int i = 0; i < n; i++) {
         shares[i] = calloc(secretCount, sizeof(matrix_t **));
@@ -64,6 +62,7 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
     for (int i = 0; i < n; i++) {
         deleteMatrices(secretCount, shares[i]);
     }
+    free(shares);
     deleteMatrices(watermarkCount, watermarkRw);
 
     distribute_shares(ShMatrices, dir, k, n);
@@ -127,15 +126,6 @@ matrix_t ** getRColumns(matrix_t * R)
         RCols[i] = getColumn(R, i);
     }
     return RCols;
-}
-
-void deleteMatrices(size_t count, matrix_t ** matrices)
-{
-    for (size_t i = 0; i < count; i++)
-    {
-       delete(matrices[i]);
-    }
-    free(matrices);
 }
 
 // THIS IS HORRIBLE

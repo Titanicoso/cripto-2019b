@@ -15,7 +15,6 @@ matrix_t ** createGMatrices(matrix_t * R, uint8_t k, uint8_t n, uint8_t m);
 matrix_t ** createVMatrices(matrix_t * A, matrix_t ** X, uint8_t n);
 matrix_t ** createXMatrices(uint8_t k, uint8_t n);
 matrix_t ** getRColumns(matrix_t * R);
-void deleteMatrices(size_t count, matrix_t ** matrices);
 matrix_t * createGMatrix(matrix_t ** RCols, uint8_t k, uint8_t m, int c);
 void joinSh(matrix_t *** shares, matrix_t ** Sh, uint8_t n, int i);
 matrix_t ** joinFinalShMatrices(matrix_t *** shares, uint8_t n, size_t count, size_t rows, size_t columns);

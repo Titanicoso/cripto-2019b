@@ -630,28 +630,28 @@ matrix_t * proj(const matrix_t * matrix, const uint8_t mod) {
   return result;
 }
 
-matrix_t * getColumn(const matrix_t * matrix, uint8_t column)
+matrix_t * getColumn(const matrix_t * matrix, size_t column)
 {
   return reduce(matrix, 0, matrix->rows, column, column + 1);
 }
 
-matrix_t * getNxNMatrix(matrix_t * matrix, uint8_t n, size_t count)
+matrix_t * getNxMMatrix(matrix_t * matrix, size_t n, size_t m, size_t count)
 {
 
-  if(NULL == matrix || 0 == n)
+  if(NULL == matrix || 0 == n || 0 == m)
     return NULL;
 
   size_t j, k;
-  size_t matrixRow = count / matrix->rows;
+  size_t matrixRow = count / matrix->columns;
   size_t matrixCol = count % matrix->columns;
-  matrix_t * result = create(n, n);
+  matrix_t * result = create(n, m);
 
   if(NULL == result)
     return NULL;
 
   for (j = 0; j < n ; j++)
   {
-    for (k = 0; k < n ; k++)
+    for (k = 0; k < m ; k++)
     {
       result->data[j][k] = matrix->data[matrixRow][matrixCol];
       matrixCol++;
@@ -666,16 +666,16 @@ matrix_t * getNxNMatrix(matrix_t * matrix, uint8_t n, size_t count)
   return result;
 }
 
-matrix_t ** getNxNMatrices(matrix_t * matrix, uint8_t n, size_t *count)
+matrix_t ** getNxMMatrices(matrix_t * matrix, size_t n, size_t m, size_t *count)
 {
 
-  if(NULL == matrix || 0 == n || NULL == count)
+  if(NULL == matrix || 0 == n || 0 == m || NULL == count )
     return NULL;
 
-  if((matrix->columns * matrix->rows % (n * n)) != 0)
+  if((matrix->columns * matrix->rows % (n * m)) != 0)
     return NULL;
 
-  *count = (matrix->columns * matrix->rows) / (n * n);
+  *count = (matrix->columns * matrix->rows) / (n * m);
 
   matrix_t ** matrices = calloc(*count, sizeof(matrix_t*));
 
@@ -685,8 +685,8 @@ matrix_t ** getNxNMatrices(matrix_t * matrix, uint8_t n, size_t *count)
   size_t i, j = 0;
   for (i = 0; i < *count; i++)
   {
-    matrices[i] = getNxNMatrix(matrix, n, j);
-    j += n * n;
+    matrices[i] = getNxMMatrix(matrix, n, m, j);
+    j += n * m;
   }
 
   return matrices;
@@ -739,4 +739,17 @@ matrix_t * joinMatrices(matrix_t ** matrices, size_t count, size_t rows, size_t 
   }
 
   return matrix;
+}
+
+void deleteMatrices(size_t count, matrix_t ** matrices)
+{
+  if(NULL == matrices)
+    return ;
+
+  for (size_t i = 0; i < count; i++)
+  {
+    if(NULL != matrices[i])
+      delete(matrices[i]);
+  }
+  free(matrices);
 }
