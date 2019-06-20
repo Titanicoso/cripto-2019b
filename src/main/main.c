@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
 #include "matrix.h"
@@ -22,9 +23,8 @@ int main(int argc, char* const argv[])
 	printWelcome();
 	options = malloc(sizeof(*options));
     int option, valid = 1;
-	while(valid && (option = getopt(argc, argv, "d:r:h:s:m:k:n:i")) != -1)
+	while(valid && (option = getopt(argc, argv, "drs:m:k:n:i:h")) != -1)
 	{
-		printf("a\n");
 		switch(option)
 		{
 			// secret image distribution
@@ -47,11 +47,11 @@ int main(int argc, char* const argv[])
 				break;
 			// mininum number of necessary shadows
 			case 'k':
-				valid = setK(atoi(optarg));
+				valid = setK(optarg);
 				break;
 			// total number of shadows to be distributed
 			case 'n':
-				valid = setN(atoi(optarg));
+				valid = setN(optarg);
 				break;
 			// In case of -d path to where the storing images are
 			// In case of -r path to where the images that contain the secret are
@@ -66,19 +66,21 @@ int main(int argc, char* const argv[])
 				break;
 		}
 	}
-	if (optind >= argc || argv[optind] == NULL) 
+	if (optind < argc) 
 	{
-		printHelp();
+		printError("Error in getopt (maybe wrong agument count).");
 		free(options);
 		exit(EXIT_FAILURE);
 	}
+
+	
 	if (!valid)
 	{
 		printError(options->error);
 		free(options);
 		exit(EXIT_FAILURE);
 	}
-	if (options->k > options->n)
+	if (options != NULL && options->k > options->n)
 	{
 		printError("k should be less or equal to n");
 		free(options);
@@ -94,7 +96,7 @@ int execute(options_st * options)
 	switch(options->mode)
 	{
 		case DISTRIBUTION_MODE: distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
-		case RECOVERY_MODE: //recoverSecret(); break;
+		case RECOVERY_MODE: recoverSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
 		default: exit(0);
 	}
 	return 0;
@@ -102,32 +104,35 @@ int execute(options_st * options)
 
 int setImage(const char* image)
 {
-	printf("d\n");
 	if (fileExists(image))
 	{
-		options->image = image;
+		options->image = calloc(sizeof(char), (strlen(image) + 1));
+		strcpy(options->image, (char*) image);
+		printf("Image path set to: %s\n", image);
 		return 1;
 	}
+	options->error = "image does not exist";
 	return 0;
 }
 
 int setWatermark(const char* watermark)
 {
-	printf("d\n");
 	if (fileExists(watermark))
 	{
-		options->watermark = watermark;
+		options->watermark = (char*) watermark;
+		printf("Watermark path set to: %s...\n", watermark);
 		return 1;
 	}
+	options->error = "watermark does not exist";
 	return 0;
 }
 
 int setDirectory(const char* directory)
 {
-	printf("d\n");
 	if (directoryExists(directory))
 	{
-		options->dir = directory;
+		options->dir = (char*) directory;
+		printf("Directory set to: %s\n", directory);
 		return 1;
 	}
 	return 0;
@@ -136,11 +141,11 @@ int setDirectory(const char* directory)
 
 int directoryExists(const char* directory)
 {
-	printf("d\n");
 	DIR* dir = opendir(directory);
 	if (dir)
 	{
     	closedir(dir);
+		return 1;
 	}
 	else if (ENOENT == errno)
 	{
@@ -151,7 +156,6 @@ int directoryExists(const char* directory)
 
 int fileExists(const char * name)
 {
-	printf("d\n");
     FILE *file;
     if ((file = fopen(name, "r")))
 	{
@@ -163,35 +167,62 @@ int fileExists(const char * name)
 
 int setMode(int mode)
 {
-		printf("d\n");
-	printf("d\n");
 	if (mode != DISTRIBUTION_MODE && mode != RECOVERY_MODE)
 	{
 		options->error = "Error setting mode";
 		return 0;
 	}
 	options->mode = mode;
+	if (mode == DISTRIBUTION_MODE)
+		printf("Distribution mode set...\n");
+	else
+		printf("Recovery mode set...\n");
 	return 1; 
 }
 
-int setK(int k)
-{
-	if (k >= 2 && k < 252)
+int setK(const char * k)
+{	
+	int knum;
+
+	if (!isNumber(k))
+		return 0;
+	knum = atoi(k);
+	if (knum >= 2 && knum < 252)
 	{
-		options->k = k;
+		printf("Set K to: %d...\n", knum);
+		options->k = knum;
 		return 1;
 	}
 	options->error = "K must be a positive integer and less than 252";
 	return 0;
 }
 
-int setN(int n)
+int setN(const char * n)
 {
-	if (n > 0 && n < 252)
+	int nnum;
+
+	if (!isNumber(n))
+		return 0;
+	nnum = atoi(n);
+	if (nnum > 0 && nnum < 252)
 	{
-		options->n = n;
+		printf("Set N to: %d...\n", nnum);
+		options->n = nnum;
 		return 1;
 	}
 	options->error = "N must be a positive integer and less than 252";
 	return 0;
+}
+
+int isNumber(const char * number)
+{
+	for (int i = 0; number[i] != '\0'; i++)
+	{
+		if (!isdigit(number[i]))
+		{
+			options->error = "the argument is not a number";
+			return 0;
+		}
+	}
+	return 1;
 }

@@ -6,23 +6,24 @@
 
 typedef struct {
     int mode;
-    const char* image;
-    const char* watermark;
+    char* image;
+    char* watermark;
     int k;
     int n;
-    const char* dir;
+    char* dir;
     char* error;
 } options_st;
 
 int setMode(int);
 int setImage(const char*);
 int setWatermark(const char*);
-int setN(int);
-int setK(int);
+int setN(const char *);
+int setK(const char *);
 int setDirectory(const char*);
 int directoryExists(const char* directory);
 int fileExists(const char * file);
 int execute(options_st * options);
+int isNumber(const char * number);
 
 extern options_st * options;
 

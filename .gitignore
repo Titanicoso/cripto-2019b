@@ -1,9 +1,10 @@
 *.o
 app
-
+try/
 .vscode
 cmake-build-debug/
 Archivos\ de\ Prueba-4-8/
 \.idea/
+Rw.bmp
 
 CMakeLists\.txt

@@ -33,5 +33,5 @@ void printHelp()
 
 void printError(char * error)
 {
-    printf("%s", error);
+    printf("%s\n\n", error);
 }
