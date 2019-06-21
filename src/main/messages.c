@@ -20,7 +20,7 @@ void printHelp()
     printf("                    In case of distribution the file must exist\n");
     printf("                    it must be black and white (8 bits/pixel)\n");
     printf("                    and it will serve as a watermark verification\n");
-    printf("                    Otherwise the image will contain de transformation of the watermark.\n");
+    printf("                    Otherwise the image will contain the transformation of the watermark.\n");
     printf("-k [NUMBER]: the minimum quantity of necessary shadows to recover the secret.\n");
     printf("-n [NUMBER]: total ammount of shadows that will be distributed.\n");
     printf("-i [PATH_TO_DIRECTORY]: in case of distribution the directory where the images that\n");
