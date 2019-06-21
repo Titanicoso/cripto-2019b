@@ -60,6 +60,7 @@ int main(int argc, char* const argv[])
 				break;
 			case 'h':
 				printHelp();
+				exit(EXIT_SUCCESS);
 				break;
 			default:
 				exit(EXIT_FAILURE);
