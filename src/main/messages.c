@@ -2,7 +2,7 @@
 
 void printWelcome()
 {
-    printf("\nWelcome to the security program\n");
+    printf("\nWelcome to the image secret sharing program\n");
     printf("Made by Agustín Calatayud, Diego Bruno Cilla and Lóránt Mikolás\n");
     printf("Execute with option -h for help\n");
     printf("Reading options and starting...\n\n");
