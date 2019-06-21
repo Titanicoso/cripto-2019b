@@ -12,7 +12,7 @@ int recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, co
   generateModInverses(MOD);
   size_t secretCount, watermarkCount;
   matrix_t ** shares = recover_shares(dir, k, n);
-  BITMAP * rw_image = read_bmp(rw, false);
+  BITMAP * rw_image = read_bmp(rw, false, true);
   size_t rows = rw_image->matrix->rows;
   size_t columns = rw_image->matrix->columns;
   matrix_t ** rwMatrices = getNxMMatrices(rw_image->matrix, n, n, &watermarkCount);
@@ -147,14 +147,16 @@ matrix_t * createRMatrixRecovery(matrix_t ** G, matrix_t * lefty, uint8_t n, uin
 
 matrix_t * createLeftyMatrix(matrix_t *** Sh, uint8_t n, uint8_t k)
 {
-  matrix_t * lefty = create(k, 2);
+  matrix_t * lefty = create(k, k);
   uint8_t j = 0;
   for (uint8_t i = 0; i < n && j < k; i++)
   {
     if(Sh[i] != NULL)
     {
-      lefty->data[j][0] = 1;
-      lefty->data[j][1] = (uint8_t) (i + 1);
+      for (uint8_t l = 0; l < k; l++)
+      {
+        lefty->data[j][l] = (uint8_t) ((uint64_t) pow(i + 1, l) % MOD);
+      }
       j++;
     }
   }

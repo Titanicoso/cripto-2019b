@@ -19,7 +19,7 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
         {
             char * path = malloc(strlen(dir) + 1 + strlen(entry->d_name) + 1);
             sprintf(path, "%s/%s", dir, entry->d_name);
-            BITMAP * bitmap = read_bmp(path, true);
+            BITMAP * bitmap = read_bmp(path, true, true);
             if (bitmap == NULL) {
                 free(path);
                 continue;
@@ -91,7 +91,7 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
         {
             char * path = malloc(strlen(dir) + 1 + strlen(entry->d_name) + 1);
             sprintf(path, "%s/%s", dir, entry->d_name);
-            BITMAP * bitmap = read_bmp(path, true);
+            BITMAP * bitmap = read_bmp(path, true, false);
             if (bitmap == NULL) {
                 free(path);
                 continue;

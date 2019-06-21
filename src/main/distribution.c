@@ -19,8 +19,8 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
 {
     seed = setSeed(time(NULL));
     generateModInverses(MOD);
-    BITMAP * secret_image = read_bmp(image, false);
-    BITMAP * watermark_image = read_bmp(watermark, false);
+    BITMAP * secret_image = read_bmp(image, false, true);
+    BITMAP * watermark_image = read_bmp(watermark, false, true);
     size_t secretCount = 0;
     size_t watermarkCount = 0;
     matrix_t ** secretMatrices = getNxMMatrices(secret_image->matrix, n, n, &secretCount);
@@ -140,7 +140,7 @@ matrix_t * createGMatrix(matrix_t ** RCols, uint8_t k, uint8_t m, int c)
         for (uint8_t j = 0; j < k; j++)
         {
             // grab column I(i, k(t-1) + j))
-            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) pow(c, j), MOD);
+            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) ((uint64_t) pow(c, j) % MOD), MOD);
             sumInPlace(col, RixC, MOD);
             delete(RixC);
         }
@@ -183,12 +183,12 @@ matrix_t ** createXMatrices(uint8_t k, uint8_t n)
 uint8_t * generateAValues(uint8_t n)
 {
     uint8_t * aValues = calloc(n, sizeof(uint8_t));
-    uint8_t a;
+    uint8_t a = 1;
     bool aAlreadyPresent;
     for (int i = 0; i < n; i++)
     {
         aAlreadyPresent = true;
-        while (aAlreadyPresent)
+        while (aAlreadyPresent || a == 0)
         {
             a = nextChar(&seed) % MOD; // 0, 1, 2, 3, 4 will be more likely check this
             aAlreadyPresent = isValueInArray(aValues, a, i);
@@ -245,7 +245,7 @@ void fillLinearlyIndependentMatrix(matrix_t * matrix, int a)
     {
         for (uint8_t j = 0; j < matrix->columns; j++)
         {
-            matrix->data[i][j] = (uint8_t) pow(a, i);
+            matrix->data[i][j] = (uint8_t) ((uint64_t) pow(a, i) % MOD);
         }
     }
 }

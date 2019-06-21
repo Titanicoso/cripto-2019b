@@ -45,7 +45,7 @@ typedef struct
 
 #pragma pack(pop)
 
-BITMAP * read_bmp(const char * filename, bool color_bmp);
+BITMAP * read_bmp(const char * filename, bool color_bmp, bool enforce_mod);
 void write_bmp(const char * filename, BITMAP * bitmap);
 void free_bmp(BITMAP * bitmap);
 

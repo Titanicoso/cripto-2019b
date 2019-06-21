@@ -1,6 +1,6 @@
 #include "bmp.h"
 
-BITMAP * read_bmp(const char * filename, bool color_bmp)
+BITMAP * read_bmp(const char * filename, bool color_bmp, bool enforce_mod)
 {
     FILE * file_ptr;
     BITMAP * bitmap;
@@ -49,7 +49,7 @@ BITMAP * read_bmp(const char * filename, bool color_bmp)
         for (j = 0; j < bitmap->matrix->columns; j++) 
         {
             fread(&bitmap->matrix->data[i][j], 1, 1, file_ptr);
-            if (bitmap->matrix->data[i][j] > 250)
+            if (enforce_mod && bitmap->matrix->data[i][j] > 250)
                 bitmap->matrix->data[i][j] = 250;
         }
     }
