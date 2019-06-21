@@ -6,5 +6,6 @@ cmake-build-debug/
 Archivos\ de\ Prueba-4-8/
 \.idea/
 Rw.bmp
+*.bmp
 
 CMakeLists\.txt
