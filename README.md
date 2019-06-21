@@ -27,7 +27,7 @@ This a verifiable image secret sharing program.
                       In case of distribution the file must exist
                       it must be black and white (8 bits/pixel)
                       and it will serve as a watermark verification
-                      Otherwise the image will contain de transformation of the watermark.
+                      Otherwise the image will contain the transformation of the watermark.
                       
    -k [NUMBER]: the minimum quantity of necessary shadows to recover the secret.
    
