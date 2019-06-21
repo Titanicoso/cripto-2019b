@@ -30,5 +30,5 @@ void printHelp()
 
 void printError(char * error)
 {
-    printf("%s\nFor help use option -h\n", error);
+    printf("Error: %s\nFor help use option -h\n", error);
 }
