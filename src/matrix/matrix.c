@@ -520,6 +520,7 @@ matrix_t * gaussElimination(const matrix_t * matrix, const uint8_t mod) {
     j++;
   }
 
+  free(aux);
   return result;
 }
 
@@ -752,4 +753,9 @@ void deleteMatrices(size_t count, matrix_t ** matrices)
       delete(matrices[i]);
   }
   free(matrices);
+}
+
+void deleteModInverses() 
+{
+  free(inverse);
 }

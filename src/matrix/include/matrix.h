@@ -58,4 +58,6 @@ void deleteMatrices(size_t count, matrix_t ** matrices);
 matrix_t * reduce(const matrix_t * matrix, const size_t rowStart, const size_t rowEnd,
                   const size_t colStart, const size_t colEnd);
 
+void deleteModInverses();
+
 #endif

@@ -40,6 +40,7 @@ bool recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, c
     deleteMatrices(k, G);
   }
   free(rwMatrices);
+  delete(lefty);
 
   for (int i = 0; i < n; i++) {
     deleteMatrices(secretCount, Sh[i]);
@@ -48,6 +49,8 @@ bool recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, c
 
   matrix_t * watermarkMatrix = joinMatrices(watermark, watermarkCount, rows, columns);
   matrix_t * secretMatrix = joinMatrices(secret, secretCount, rows, columns);
+  deleteMatrices(secretCount, secret);
+  deleteMatrices(watermarkCount, watermark);
 
   delete(rw_image->matrix);
   rw_image->matrix = secretMatrix;
@@ -58,6 +61,7 @@ bool recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, c
   delete(secretMatrix);
   free_bmp(rw_image);
 
+  deleteModInverses();
   return true;
 }
 

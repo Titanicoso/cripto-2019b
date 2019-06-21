@@ -85,6 +85,12 @@ int main(int argc, char* const argv[])
 		free(options);
 		exit(EXIT_FAILURE);
 	}
+	if(options->mode == DISTRIBUTION_MODE && !fileExists(options->image)) 
+	{
+		printError("No secret image provided");
+		free(options);
+		exit(EXIT_FAILURE);
+	}
 	if (!execute(options))
 	{
 		printError(options->error);
