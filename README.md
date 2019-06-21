@@ -12,7 +12,7 @@ This a verifiable image secret sharing program.
    3.2. A distribution example would be: `./app -d -s "path/to/secret.bmp" -m "path/to/watermark.bmp" -k 4 -n 8 -i "path/to/shares"`.
    3.2. The options to run are:
    -d: sets distribution mode.
-   -r: sets recovery mode.\n");
+   -r: sets recovery mode.
    -s [PATH_TO_IMAGE]: the path of the image of extension .bmp.
                        In case of distribution the file must exist
                        and it must be black and white (8 bits/pixel)
