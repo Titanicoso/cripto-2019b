@@ -72,8 +72,6 @@ int main(int argc, char* const argv[])
 		free(options);
 		exit(EXIT_FAILURE);
 	}
-
-	
 	if (!valid)
 	{
 		printError(options->error);
@@ -86,33 +84,46 @@ int main(int argc, char* const argv[])
 		free(options);
 		exit(EXIT_FAILURE);
 	}
-	execute(options);
+	if (!execute(options))
+	{
+		printError(options->error);
+		free(options);
+		exit(EXIT_FAILURE);
+	}
 	free(options);
+	printf("Program ending...");
 	exit(EXIT_SUCCESS);
 }
 
-int execute(options_st * options)
+bool execute(options_st * options)
 {
+	bool ret;
 	switch(options->mode)
 	{
-		case DISTRIBUTION_MODE: distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
-		case RECOVERY_MODE: recoverSecret(options->image, options->k, options->n, options->dir, options->watermark); break;
-		default: exit(0);
+		case DISTRIBUTION_MODE: if (!fileExists(options->image))
+								{
+									options->error = "image does not exist";
+									ret = false;
+									break;
+								}
+								printf("\nStarting distribution...\n");
+								ret = distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); 
+								printf("Secret distributed!\n");
+								break;
+								
+		case RECOVERY_MODE: 	printf("\nStarting recovery...\n");
+								ret = recoverSecret(options->image, options->k, options->n, options->dir, options->watermark);
+								printf("Secret recovered!\n");
+								break;
+		default: ret = false; options->error = "invalid mode set"; break;
 	}
-	return 0;
+	return ret;
 }
 
 int setImage(const char* image)
 {
-	if (fileExists(image))
-	{
-		options->image = calloc(sizeof(char), (strlen(image) + 1));
-		strcpy(options->image, (char*) image);
-		printf("Image path set to: %s\n", image);
-		return 1;
-	}
-	options->error = "image does not exist";
-	return 0;
+	options->image = (char *) image;
+	return 1;
 }
 
 int setWatermark(const char* watermark)

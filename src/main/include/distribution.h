@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "matrix.h"
 
-int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * watermark);
+bool distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * watermark);
 void fillRandomMatrix(matrix_t * matrix);
 void fillLinearlyIndependentMatrix(matrix_t * matrix, int a);
 bool isValueInArray(uint8_t * array, uint8_t value, int size);

@@ -15,7 +15,7 @@
 int64_t seed; 
 
 //TODO: Show errors
-int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * watermark)
+bool distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * watermark)
 {
     seed = setSeed(time(NULL));
     generateModInverses(MOD);
@@ -75,7 +75,7 @@ int distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir,
 
     free_bmp(watermark_image);
     free_bmp(secret_image);
-    return EXIT_SUCCESS;
+    return true;
 }
 
 matrix_t ** joinFinalShMatrices(matrix_t *** shares, uint8_t n, size_t count, size_t rows, size_t columns)

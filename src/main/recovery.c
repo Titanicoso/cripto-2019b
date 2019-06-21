@@ -7,7 +7,7 @@
 #define WATERMARK_FILE "Watermark.bmp"
 
 //TODO: Show errors
-int recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * rw)
+bool recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, const char * rw)
 {
   generateModInverses(MOD);
   size_t secretCount, watermarkCount;
@@ -58,7 +58,7 @@ int recoverSecret(const char * image, uint8_t k, uint8_t n, const char * dir, co
   delete(secretMatrix);
   free_bmp(rw_image);
 
-  return EXIT_SUCCESS;
+  return true;
 }
 
 matrix_t *** splitShares(matrix_t ** shares, uint8_t n, uint8_t k, size_t* secretCount)
