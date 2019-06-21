@@ -85,6 +85,18 @@ int main(int argc, char* const argv[])
 		free(options);
 		exit(EXIT_FAILURE);
 	}
+	if(options->mode == DISTRIBUTION_MODE && !fileExists(options->image)) 
+	{
+		printError("No secret image provided");
+		free(options);
+		exit(EXIT_FAILURE);
+	}
+	if(!(options->n == 4 && options->k == 2) && !(options->n == 8 && options->k == 4)) 
+	{
+		printError("(n, k) combinations should be (4,2) or (8,4)");
+		free(options);
+		exit(EXIT_FAILURE);
+	}
 	if (!execute(options))
 	{
 		printError(options->error);

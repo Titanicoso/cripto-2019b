@@ -52,6 +52,7 @@ bool distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir
         deleteMatrices(n, V);
         deleteMatrices(n, G);
         delete(W);
+        free(Sh);
     }
     free(secretMatrices);
     free(watermarkMatrices);
@@ -75,6 +76,8 @@ bool distributeSecret(const char * image, uint8_t k, uint8_t n, const char * dir
 
     free_bmp(watermark_image);
     free_bmp(secret_image);
+
+    deleteModInverses();
     return true;
 }
 
@@ -140,7 +143,7 @@ matrix_t * createGMatrix(matrix_t ** RCols, uint8_t k, uint8_t m, int c)
         for (uint8_t j = 0; j < k; j++)
         {
             // grab column I(i, k(t-1) + j))
-            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) ((uint64_t) pow(c, j) % MOD), MOD);
+            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) ((uint64_t) pow(c, j)), MOD);
             sumInPlace(col, RixC, MOD);
             delete(RixC);
         }

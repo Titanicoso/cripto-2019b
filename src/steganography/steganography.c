@@ -19,7 +19,7 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
         {
             char * path = malloc(strlen(dir) + 1 + strlen(entry->d_name) + 1);
             sprintf(path, "%s/%s", dir, entry->d_name);
-            BITMAP * bitmap = read_bmp(path, true, true);
+            BITMAP * bitmap = read_bmp(path, true, false);
             if (bitmap == NULL) {
                 free(path);
                 continue;
@@ -40,6 +40,12 @@ void distribute_shares(matrix_t ** Sh, const char * dir, uint8_t k, uint8_t n)
     }
 
     closedir(folder);
+
+    if (entry_index != n) 
+    {
+        printf("Error: not enough distribution images\n");
+        exit(EXIT_FAILURE);
+    }
     return;
 }
 
@@ -112,6 +118,12 @@ matrix_t ** recover_shares(const char * dir, uint8_t k, uint8_t n)
     }
 
     closedir(folder);
+
+    if (entry_index < k) 
+    {
+        printf("Error: not enough recovery images\n");
+        exit(EXIT_FAILURE);
+    }
     return shares;
 }
 
