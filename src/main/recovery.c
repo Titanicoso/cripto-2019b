@@ -155,7 +155,7 @@ matrix_t * createLeftyMatrix(matrix_t *** Sh, uint8_t n, uint8_t k)
     {
       for (uint8_t l = 0; l < k; l++)
       {
-        lefty->data[j][l] = (uint8_t) ((uint64_t) pow(i + 1, l) % MOD);
+        lefty->data[j][l] = (uint8_t) ((uint64_t) pow(i + 1, l));
       }
       j++;
     }

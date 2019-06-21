@@ -140,7 +140,7 @@ matrix_t * createGMatrix(matrix_t ** RCols, uint8_t k, uint8_t m, int c)
         for (uint8_t j = 0; j < k; j++)
         {
             // grab column I(i, k(t-1) + j))
-            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) ((uint64_t) pow(c, j) % MOD), MOD);
+            matrix_t * RixC = multiplyByScalar(RCols[k * i + j], (uint8_t) ((uint64_t) pow(c, j)), MOD);
             sumInPlace(col, RixC, MOD);
             delete(RixC);
         }
