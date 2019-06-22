@@ -38,4 +38,5 @@ This a verifiable image secret sharing program.
                            Otherwise is the path to directory where the images with the secret are.
                               
    -v: verbose mode.
+   
    -h: help. 
