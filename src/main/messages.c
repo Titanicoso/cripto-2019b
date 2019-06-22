@@ -26,6 +26,7 @@ void printHelp()
     printf("-i [PATH_TO_DIRECTORY]: in case of distribution the directory where the images that\n");
     printf("                        will be use to hide the secret are.\n");
     printf("                        Otherwise is the path to directory where the images with the secret are.\n");
+    printf("-v: verbose mode.\n");
 }
 
 void printError(char * error)

@@ -6,6 +6,7 @@
 
 typedef struct {
     int mode;
+    int verbose;
     char* image;
     char* watermark;
     int k;

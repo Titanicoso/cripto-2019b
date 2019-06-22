@@ -1,11 +1,11 @@
 all: src
 
-src: app
+src: ss
 	cd src; make all;
-	mv ./src/app ./
+	mv ./src/ss ./
 
 clean:
 	cd src; make clean;
-	[ -e app ] && rm app
+	rm -f ss
 
-.PHONY: all clean app
+.PHONY: all clean app ss

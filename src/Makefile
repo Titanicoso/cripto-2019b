@@ -4,9 +4,9 @@ DEPS = $(wildcard ./*/include/*.h)
 DEPSFOLDER = $(wildcard ../*/include)
 INC_PARAMS=$(DEPSFOLDER:%=-I%)
 
-all: main matrix bmp random steganography app 
+all: main matrix bmp random steganography ss 
 
-fromzero: clean all ; ./app -d -s "../try/Secreto.bmp" -m "../try/Marca.bmp" -k 4 -n 8 -i "../try/shares"
+fromzero: clean all ; ./ss -d -s "../try/Secreto.bmp" -m "../try/Marca.bmp" -k 4 -n 8 -i "../try/shares"
 
 main:
 	cd main; make all
@@ -23,7 +23,7 @@ steganography:
 random:
 	cd random; make all
 
-app:
+ss:
 	$(MAIN): $(DEPS) $(OBJECTS)
 	$(GCC) $(OBJECTS) -o $@  $(INC_PARAMS) $(GCCFLAGS)
 
@@ -34,4 +34,4 @@ clean:
 	cd random; make clean
 	cd bmp; make clean
 
-.PHONY: all clean fromzero bmp random main steganography matrix app
+.PHONY: all clean fromzero bmp random main steganography matrix ss

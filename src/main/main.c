@@ -20,10 +20,10 @@ options_st * options;
 
 int main(int argc, char* const argv[])
 {
-	printWelcome();
 	options = malloc(sizeof(*options));
+	options->verbose = 0;
     int option, valid = 1;
-	while(valid && (option = getopt(argc, argv, "drs:m:k:n:i:h")) != -1)
+	while(valid && (option = getopt(argc, argv, "drs:m:k:n:i:hv")) != -1)
 	{
 		switch(option)
 		{
@@ -58,6 +58,9 @@ int main(int argc, char* const argv[])
 			case 'i':
 				valid = setDirectory(optarg);
 				break;
+			case 'v':
+				options->verbose = 1;
+				break;
 			case 'h':
 				printHelp();
 				exit(EXIT_SUCCESS);
@@ -67,9 +70,10 @@ int main(int argc, char* const argv[])
 				break;
 		}
 	}
-	if (optind < argc) 
+	if (argc < 12) 
 	{
-		printError("Error in getopt (maybe wrong agument count).");
+		printf("optind %d\n", optind);
+		printError("getting options (maybe not enough arguments).");
 		free(options);
 		exit(EXIT_FAILURE);
 	}
@@ -104,12 +108,23 @@ int main(int argc, char* const argv[])
 		exit(EXIT_FAILURE);
 	}
 	free(options);
-	printf("Program ending...");
 	exit(EXIT_SUCCESS);
 }
 
 bool execute(options_st * options)
 {
+	if (options->verbose)
+	{
+		printWelcome();
+		if (options->mode == DISTRIBUTION_MODE)
+			printf("Distribution mode set...\n");
+		else
+			printf("Recovery mode set...\n");
+		printf("Set N to: %d...\n", options->n);
+		printf("Directory set to: %s\n", options->dir);
+		printf("Set K to: %d...\n", options->k);
+		printf("Watermark path set to: %s...\n", options->watermark);
+	}
 	bool ret;
 	switch(options->mode)
 	{
@@ -119,16 +134,20 @@ bool execute(options_st * options)
 									ret = false;
 									break;
 								}
-								printf("\nStarting distribution...\n");
+								if (options->verbose) printf("\nStarting distribution...\n");
 								ret = distributeSecret(options->image, options->k, options->n, options->dir, options->watermark); 
-								printf("Secret distributed!\n");
+								if (options->verbose) printf("Secret distributed!\n");
 								break;
 								
-		case RECOVERY_MODE: 	printf("\nStarting recovery...\n");
+		case RECOVERY_MODE: 	if (options->verbose) printf("\nStarting recovery...\n");
 								ret = recoverSecret(options->image, options->k, options->n, options->dir, options->watermark);
-								printf("Secret recovered!\n");
+								if (options->verbose) printf("Secret recovered!\n");
 								break;
 		default: ret = false; options->error = "invalid mode set"; break;
+	}
+	if (options->verbose)
+	{
+		printf("Program ending...");
 	}
 	return ret;
 }
@@ -144,7 +163,6 @@ int setWatermark(const char* watermark)
 	if (fileExists(watermark))
 	{
 		options->watermark = (char*) watermark;
-		printf("Watermark path set to: %s...\n", watermark);
 		return 1;
 	}
 	options->error = "watermark does not exist";
@@ -156,7 +174,6 @@ int setDirectory(const char* directory)
 	if (directoryExists(directory))
 	{
 		options->dir = (char*) directory;
-		printf("Directory set to: %s\n", directory);
 		return 1;
 	}
 	return 0;
@@ -193,14 +210,10 @@ int setMode(int mode)
 {
 	if (mode != DISTRIBUTION_MODE && mode != RECOVERY_MODE)
 	{
-		options->error = "Error setting mode";
+		options->error = "Error setting mode: only -d or -r are valid";
 		return 0;
 	}
 	options->mode = mode;
-	if (mode == DISTRIBUTION_MODE)
-		printf("Distribution mode set...\n");
-	else
-		printf("Recovery mode set...\n");
 	return 1; 
 }
 
@@ -213,7 +226,6 @@ int setK(const char * k)
 	knum = atoi(k);
 	if (knum >= 2 && knum < 252)
 	{
-		printf("Set K to: %d...\n", knum);
 		options->k = knum;
 		return 1;
 	}
@@ -230,7 +242,6 @@ int setN(const char * n)
 	nnum = atoi(n);
 	if (nnum > 0 && nnum < 252)
 	{
-		printf("Set N to: %d...\n", nnum);
 		options->n = nnum;
 		return 1;
 	}

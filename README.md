@@ -36,3 +36,5 @@ This a verifiable image secret sharing program.
    -i [PATH_TO_DIRECTORY]: in case of distribution the directory where the images that
                            will be use to hide the secret are.
                            Otherwise is the path to directory where the images with the secret are.
+                              
+   -v: verbose mode.
