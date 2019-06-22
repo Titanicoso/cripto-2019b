@@ -4,7 +4,7 @@ This a verifiable image secret sharing program.
 
 ## Steps to execute
 
-1. Open terminal in the programs root folder.
+1. Open terminal in the program's root folder.
 2. Execute commmand: make all 
    (In case you already executed the program and want to recompile it use "make clean" and "make all")
 3. Run the program with `./app`:
