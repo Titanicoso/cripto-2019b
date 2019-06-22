@@ -1,5 +1,6 @@
 *.o
 app
+ss
 try/
 .vscode
 cmake-build-debug/
