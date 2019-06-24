@@ -72,7 +72,6 @@ int main(int argc, char* const argv[])
 	}
 	if (argc < 12) 
 	{
-		printf("optind %d\n", optind);
 		printError("getting options (maybe not enough arguments).");
 		free(options);
 		exit(EXIT_FAILURE);
